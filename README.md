@@ -2,7 +2,7 @@ touchVision (WIP)
 ===
 
 # Build
-``
+```
 lein uberjar
 ```
 
