@@ -41,3 +41,34 @@ div#content {
 body.menu-active div#content { left: 284px; border-radius: 7px 0 0 7px; }
 body.menu-active div#content .menu-trigger { left: 294px; }
 
+svg {
+  font: 10px sans-serif;
+}
+
+.area {
+  fill: steelblue;
+  clip-path: url(#clip);
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.brush .extent {
+  stroke: #fff;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
+}
+
+.debug-view {
+  height: 500px;
+  overflow: scroll;
+}
+
+.pgm-container svg {
+  display: block;
+  margin: auto;
+}

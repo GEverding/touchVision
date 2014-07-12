@@ -16,17 +16,21 @@
                  [http-kit "2.1.16"]
                  [lib-noir "0.8.3"]
                  [cheshire "5.3.1"]
-                 [liberator "0.11.0"]
+                 [liberator "0.12.0-SNAPSHOT"]
                  [me.shenfeng/mustache "1.1"]
                  [com.taoensso/timbre "3.2.0"]
+                 [clj-time "0.7.0"]
                  [com.datomic/datomic-free "0.9.4766"]
                  [prismatic/schema "0.2.4"]
                  ; Client
                  [prismatic/dommy "0.1.2"]
                  [sablono "0.2.17"]
+                 [net.drib/strokes "0.5.1"]
                  [cljs-ajax "0.2.6"]
                  [prismatic/schema "0.2.5-SNAPSHOT"]
                  [prismatic/om-tools "0.2.1"]
+                 [com.andrewmcveigh/cljs-time "0.1.5"]
+                 [jarohen/chord "0.4.1"]
                  [om "0.6.3"]]
   :plugins [[lein-cljsbuild "1.0.3"]
             [lein-shell "0.3.0"]
@@ -65,6 +69,7 @@
                           :externs ["resources/public/js/lib/jquery.min.js"
                                     "resources/public/js/lib/bootstrap.min.js"
                                     "resources/public/js/lib/lodash.min.js"
+                                    "resources/public/js/lib/d3.min.js"
                                     "react/externs/react.js" ] }}
              ]}
   :aliases  {"bower" ["shell" "bower" "install"]
