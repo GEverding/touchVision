@@ -13,12 +13,15 @@
             [client.views.pgm :refer [pgm-view]]
             [client.views.debug :refer [debug-view]]
             [client.views.navbar :refer [navbar-controls]]
+            [client.views.options :refer [options-view]]
             [client.router :as r :refer [create-routes]]
             [client.request :refer [request]]))
 
 (enable-console-print!)
 
 (def app-state (atom {:chan (chan)
+                      :options {:running false
+                                :stream :random}
                       :data [] }))
 
 (defn websocket "init" []
@@ -50,20 +53,20 @@
 (defn index []
   (om/root
     (fn [app owner]
-      (html [:div
-             (om/build navbar-controls app)
-             [:div {:class "container-fluid"}
-              [:div {:class "row"}
-               [:h1 "touchVision"]
-               ]
-              [:div {:class "row"}
-               [:div {:class "col-lg-1"}]
-               [:div {:class "col-lg-11"}
-                (om/build debug-view app)
-                ]]
-              [:div {:class "row"}
-                (om/build pgm-view app)
-                ]]]))
+      (om/component
+        (html [:div
+               (om/build navbar-controls app)
+               [:div {:class "container-fluid"}
+                [:div {:class "row"}
+                 [:h1 "touchVision"] ]
+                [:div {:class "row"}
+                 [:div {:class "col-lg-1"}
+                  (om/build options-view  app )]
+                 [:div {:class "col-lg-11"}
+                  (om/build debug-view app)]]
+                [:div {:class "row"}
+                 (om/build pgm-view app)
+                 ]]])))
 
     app-state
     {:target (sel1 ".js-app")})

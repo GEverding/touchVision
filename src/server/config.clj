@@ -4,7 +4,8 @@
                             :port 5000
                             :thread 4
                             :datomic-uri "datomic:free://localhost:4334/touchVision"
-                            }))
+                            :capture-queue "touchVision.glove"
+                            :playback-queue "touchVision.playback"}))
 
 (defn cfg [key & [default]]
   (if-let [v (or (key @app-configs) default)]

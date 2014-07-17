@@ -10,6 +10,7 @@
             [clojure.test :as test]
             [clojure.tools.namespace.repl :refer (refresh refresh-all)]
             [schema.coerce :as coerce]
+            [langohr.core :as rabbit]
             [schema.core :as s]
             [server.core :as jarvis]
             [server.db :as db]

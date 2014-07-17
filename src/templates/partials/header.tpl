@@ -2,7 +2,7 @@
 {{#title}}<title>{{title}}</title>{{/title}}
 
 <!-- No title, use default one -->
-{{^title}}<title>Jarvis</title>{{/title}}
+{{^title}}<title>touchVision</title>{{/title}}
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="/css/lib/bootstrap.min.css" rel="stylesheet"/>
 <link href="/css/lib/bootstrap-theme.min.css" rel="stylesheet"/>
