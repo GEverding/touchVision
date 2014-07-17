@@ -1,7 +1,6 @@
 (ns server.system
   (:gen-class)
-  (:require [datomic.api :as d]
-            [server
+  (:require [server
                 [core :refer [ start-server stop-server ]]
                 [db :as db]
                 [config :refer [ cfg ]]
@@ -18,7 +17,6 @@
 
 (defn start [system]
   (do
-    (db/create system)
     (start-server system)
     system)
   )
