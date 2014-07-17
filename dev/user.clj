@@ -9,7 +9,6 @@
             [clojure.string :as str]
             [clojure.test :as test]
             [clojure.tools.namespace.repl :refer (refresh refresh-all)]
-            [datomic.api :as d]
             [schema.coerce :as coerce]
             [schema.core :as s]
             [server.core :as jarvis]
