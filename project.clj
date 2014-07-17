@@ -9,6 +9,7 @@
                  [org.clojure/clojure-contrib "1.2.0"]
                  ; Server
                  [compojure "1.1.6"]
+                 [com.novemberain/langohr "2.11.0"]
                  [ring/ring-core "1.3.0-RC1"]
                  [ring/ring-devel "1.3.0-RC1"]
                  [ring/ring-json "0.3.1"]
