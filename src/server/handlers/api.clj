@@ -34,8 +34,7 @@
 
 (defn ^:private wrap-data [data]
   {:type :post
-   :data data }
-  )
+   :data data })
 
 (defn ^:private gen-fake-data []
   (wrap-data
@@ -46,7 +45,7 @@
     :timestamp (floor (random-date
                         (c/to-long (t/now))
                         (c/to-long
-                          (t/plus (t/now) (t/seconds 100)))))}) {})
+                          (t/plus (t/now) (t/seconds 100)))))}))
 
 (defn ^:private message-handler
   [ws-chan ch {:keys [content-type delivery-tag type] :as meta} ^bytes payload]
