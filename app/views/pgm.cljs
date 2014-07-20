@@ -10,6 +10,8 @@
             [om.core :as om :include-macros true]
             [sablono.core :as html :refer-macros [html]]))
 
+(def pressure-colours ["#C25051" "#E09432" "#EFBD2E" "#73B845" "#009BDD"])
+
 (strokes/bootstrap)
 
 ;; (defn Band
@@ -97,7 +99,7 @@
                      :ref "svg"}
                [:g {:class "data"}
                 (for [d data]
-                  [:rect {:color "red"
+                  [:rect {:style {:fill (nth pressure-colours (:pressure d)) }
                           :height height
                           :width 2
                           :x (x (:timestamp d))}])]
