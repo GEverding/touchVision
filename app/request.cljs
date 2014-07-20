@@ -6,11 +6,11 @@
                      :keywords? true })
 
 (defn make-request
-  [{:keys [success fail params] :as opts :or { success identity fail identity params {} }}]
+  [{:keys [success fail data] :as opts :or { success identity fail identity params "" }}]
   (-> default-params
       (assoc :handler success)
       (assoc :error-handler fail)
-      (assoc :params params)))
+      (assoc :params data)))
 
 (defmulti request (fn [req _ _] ( :type req ) ))
 

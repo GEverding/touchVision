@@ -1,5 +1,6 @@
 (ns server.handlers.index
   (:require [liberator.core :refer [defresource]]
+
             [taoensso.timbre :as timbre]
             [clojure.core.match :refer [match]]
             [cheshire.core :as json]
@@ -16,8 +17,3 @@
   :known-content-types #(util/check-content-type %)
   :handle-ok (fn [_] (tmpls/index)))
 
-(defresource focus
-  :available-media-types ["text/html"]
-  :allowed-methods [:get]
-  :known-content-types #(util/check-content-type %)
-  :handle-ok (fn [_] (tmpls/index)))
