@@ -11,11 +11,12 @@
             [clj-time.core :as t]
             [clj-time.coerce :as c]
             [clojure.contrib.math :refer [floor]]
-            [clojure.core.async :refer [<! >!! >! put! close! chan sliding-buffer dropping-buffer go-loop]]
+            [clojure.core.async :refer [<!  >! take! put! close! chan sliding-buffer dropping-buffer go-loop]]
             [liberator.core :refer [defresource]]
             [taoensso.timbre :as timbre]
             [clojure.core.match :refer [match]]
             [cheshire.core :as json :refer [decode encode]]
+            [server.handlers.util :refer :all]
             [server.config :refer [cfg]]))
 
 (timbre/refer-timbre)
@@ -31,9 +32,13 @@
   [x start end]
   (for [low (range x )] (random-date start end)))
 
-(defn ^:private gen-fake-data []
+(defn ^:private wrap-data [data]
   {:type :post
-   :data
+   :data data }
+  )
+
+(defn ^:private gen-fake-data []
+  (wrap-data
    {:x (rand 100)
     :y (rand 100)
     :z (rand 100)
@@ -41,48 +46,16 @@
     :timestamp (floor (random-date
                         (c/to-long (t/now))
                         (c/to-long
-                          (t/plus (t/now) (t/seconds 100)))))}})
-(def ^{:const true}
-  default-exchange-name "")
+                          (t/plus (t/now) (t/seconds 100)))))}) {})
 
 (defn ^:private message-handler
   [ws-chan ch {:keys [content-type delivery-tag type] :as meta} ^bytes payload]
   (let [blob (String. payload "UTF-8")]
-    (debug(format "[rabbit] Received a message: %s, delivery tag: %d, content type: %s, type: %s"
-                  (String. payload "UTF-8") delivery-tag content-type type))
-    (>!! ws-chan (decode blob))))
+    (debug ws-chan)
+    (put! ws-chan (decode blob true))
+    (debug (format "[rabbit] Received a message: %s, delivery tag: %d, content type: %s, type: %s"
+                  (decode blob true) delivery-tag content-type type))))
 
-;; convert the body to a reader. Useful for testing in the repl
-;; where setting the body to a string is much simpler.
-(defn body-as-string [ctx]
-  (if-let [body (get-in ctx [:request :body])]
-    (condp instance? body
-      java.lang.String body
-      (do
-        print body
-      (slurp (io/reader body))))))
-
-;; For PUT and POST parse the body as json and store in the context
-;; under the given key.
-(defn parse-json [context key]
-  (when (#{:put :post} (get-in context [:request :request-method]))
-    (try
-      (if-let [body (body-as-string context)]
-        (let [data (decode body true)]
-          [false {key data}])
-        {:message "No body"})
-      (catch Exception e
-        (.printStackTrace e)
-        {:message (format "IOException: %s" (.getMessage e))}))))
-
-;; For PUT and POST check if the content type is json.
-(defn check-content-type [ctx content-types]
-  (if (#{:put :post} (get-in ctx [:request :request-method]))
-    (or
-     (some #{(get-in ctx [:request :headers "content-type"])}
-           content-types)
-     [false {:message "Unsupported Content-Type"}])
-    true))
 
 (defresource switch-stream
   :available-media-types ["application/json"]
@@ -115,10 +88,10 @@
 (defn data-feed [req]
   (let [conn  (rmq/connect)
         ch    (lch/open conn)
-        qname (cfg :capture-queue)
-        rmq-chan (sliding-buffer 100) ;; sanity and memory
-        ]
-    (lq/declare ch qname :exclusive false :auto-delete true)
+        rmq-chan (chan)
+        qname (lq/declare-server-named ch :exclusive true :auto-delete true) ]
+    (le/declare ch "touchVision" "fanout")
+    (lq/bind ch qname "touchVision")
     (lc/subscribe ch qname (partial message-handler rmq-chan) :auto-ack true)
     (with-channel req ws-ch
       {:read-ch (chan (dropping-buffer 10))
@@ -133,13 +106,12 @@
                                 (debug new-data)
                                 (>! ws-ch new-data)
                                 (Thread/sleep 500))
-                              ))
+                              ()))
                    :live (let [new-data (<! rmq-chan)]
+                          (debug new-data)
                            (if is-running?
-                             (do
-                               (debug new-data)
-                               (>! ws-ch new-data))
-                             (identity)))
+                             (>! ws-ch (wrap-data new-data))
+                             ()))
                    (error "not valid stream type" which-stream?))
                  (recur))))))
 
