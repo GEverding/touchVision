@@ -63,11 +63,18 @@ svg {
 }
 
 .debug-view {
-  height: 500px;
+  height: 600px;
   overflow: scroll;
 }
 
 .pgm-container svg {
   display: block;
   margin: auto;
+}
+
+.data-row {
+  &:hover {
+    cursor: pointer;
+    color: #AD999E;
+  }
 }

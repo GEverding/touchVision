@@ -36,16 +36,13 @@
   {:type :post
    :data data })
 
-(defn ^:private gen-fake-data []
+(defn ^:private gen-fake-data [i]
   (wrap-data
    {:x (rand 100)
     :y (rand 100)
     :z (rand 100)
     :pressure (floor (rand 5))
-    :timestamp (floor (random-date
-                        (c/to-long (t/now))
-                        (c/to-long
-                          (t/plus (t/now) (t/seconds 100)))))}))
+    :timestamp (+ i (rand))}))
 
 (defn ^:private message-handler
   [ws-chan ch {:keys [content-type delivery-tag type] :as meta} ^bytes payload]
@@ -95,16 +92,16 @@
     (with-channel req ws-ch
       {:read-ch (chan (dropping-buffer 10))
        :format :edn} ; again, :edn is default
-      (go-loop []
+      (go-loop [i 25]
                (let [is-running? (:is-running? @mode)
                      which-stream? (:stream @mode) ]
                  (condp = which-stream?
-                   :fake  (let [new-data (gen-fake-data)]
+                   :fake  (let [new-data (gen-fake-data i)]
                             (if is-running?
                               (do
                                 (debug new-data)
                                 (>! ws-ch new-data)
-                                (Thread/sleep 500))
+                                (Thread/sleep (+ 1000 (rand-int 200))))
                               ()))
                    :live (let [new-data (<! rmq-chan)]
                           (debug new-data)
@@ -112,5 +109,5 @@
                              (>! ws-ch (wrap-data new-data))
                              ()))
                    (error "not valid stream type" which-stream?))
-                 (recur))))))
+                 (recur (+ i (rand))))))))
 
