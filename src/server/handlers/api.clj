@@ -10,16 +10,18 @@
             [chord.http-kit :refer [with-channel]]
             [clj-time.core :as t]
             [clj-time.coerce :as c]
-            [clojure.contrib.math :refer [floor]]
+            [clojure.math.numeric-tower :as math :refer [floor round]]
             [clojure.core.async :refer [<!  >! take! put! close! chan sliding-buffer dropping-buffer go-loop]]
             [liberator.core :refer [defresource]]
             [taoensso.timbre :as timbre]
             [clojure.core.match :refer [match]]
-            [cheshire.core :as json :refer [decode encode]]
+            [cheshire.core :as json :refer [decode encode generate-string]]
             [server.handlers.util :refer :all]
             [server.config :refer [cfg]]))
 
 (timbre/refer-timbre)
+(defonce conn  (rmq/connect))
+(defonce ch    (lch/open conn))
 
 (defonce mode (atom {:stream :fake
                      :is-running? false}))
@@ -81,13 +83,33 @@
              (println @mode)
              )))
 
+(defn cap [data]
+  (let [quantized (- (* (-> (str data) read-string round) 2000) 1000)]
+    (if (< quantized 0)
+      0
+      quantized)))
+
+(defresource start-playback
+  :available-media-types ["application/json"]
+  :allowed-methods [:post]
+  :known-content-types #(check-content-type % ["application/json"])
+  :malformed? #(parse-json % ::data)
+  :handle-created (fn [_] ( encode {:data "success"}) )
+  :post! (fn [ctx]
+           (   let [qname (lq/declare-server-named ch :exclusive true)
+                    data (-> ctx ::data :pressure cap)
+                    blob (encode { :pressure data }) ]
+             (le/direct ch "touchvision")
+             (info "[playback]: " blob)
+             (lb/publish ch "touchvision" "playback"  blob :content-type "text/plain")
+             data
+             )))
+
 (defn data-feed [req]
-  (let [conn  (rmq/connect)
-        ch    (lch/open conn)
-        rmq-chan (chan)
+  (let [rmq-chan (chan)
         qname (lq/declare-server-named ch :exclusive true :auto-delete true) ]
-    (le/declare ch "touchVision" "fanout")
-    (lq/bind ch qname "touchVision")
+    (le/direct ch "touchvision")
+    (lq/bind ch qname "touchvision" :routing-key "glove")
     (lc/subscribe ch qname (partial message-handler rmq-chan) :auto-ack true)
     (with-channel req ws-ch
       {:read-ch (chan (dropping-buffer 10))
