@@ -1,4 +1,4 @@
-(defproject touchVision "0.1.0"
+(defproject touchVision "0.2.0"
   :description ""
   :url "https://github.com/GEverding/touchVision"
   :dependencies [[org.clojure/clojure "1.6.0"]
