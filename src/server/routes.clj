@@ -25,6 +25,7 @@
   (GET "/ws" [] api/data-feed)
   (ANY "/switch/mode" [] api/switch-running)
   (ANY "/switch/stream" [] api/switch-stream)
+  (ANY "/playback" [] api/start-playback)
   (route/resources "/")
   (route/not-found "No Found!"))
 

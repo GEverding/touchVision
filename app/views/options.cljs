@@ -29,10 +29,13 @@
    (let [v (om/get-state owner k)
          new-val (not v)]
      (om/set-state! owner k new-val)
+     (om/transact! app :filtered (fn [_] false))
+     (om/transact! app :visible (fn [_] true))
      (put! chan {k new-val})))
   ([app owner chan k v]
    (do
      (om/set-state! owner k v)
+     (om/transact! app :filtered (fn [_] false))
      (om/transact! app :data (fn [_] []))
      (put! chan {k v})))
   )
@@ -52,7 +55,7 @@
         (.log js/console "rendering switch")
         (html [:div {:class "switch-container"}
                [:button {:type "button"
-                         :class (str "btn btn-default "
+                         :class (str "btn btn-info col-lg-6 "
                                      (if (is-active? :live)
                                        "active"
                                        ""))
@@ -60,7 +63,7 @@
                         :on-click #(handle-change app owner c :stream :live )
                          } "Live"]
                [:button {:type "button"
-                         :class (str "btn btn-default "
+                         :class (str "btn btn-info col-lg-6 "
                                      (if (is-active? :fake)
                                        "active"
                                        ""))
@@ -77,9 +80,9 @@
     om/IRenderState
     (render-state [_ state]
       (let []
-      (html [:div {:class "toggle-container"}
+      (html [:div {:class " col-lg-12 toggle-container"}
               [:button {:type "button"
-                        :class (str "btn btn-default " (if (:toggle state)
+                        :class (str "btn btn-warning col-lg-12 btn-block" (if (:toggle state)
                                                          "active"
                                                          ""))
                         :ref "run"
@@ -111,7 +114,8 @@
       (let [stream (om/get-state owner :stream-chan)
             mode (om/get-state owner :toggle-chan)]
         (html [:div {:class "row option-container"}
-               [:div {:class "option-group"}
+               [:h3.col-lg-12 "Options"]
+               [:div {:class "col-lg-12 option-group"}
                 (om/build switch app
                           {:init-state {:stream-chan stream}})]
                [:div {:class "option-group"}

@@ -13,17 +13,18 @@
 
 (defn navbar-html []
   (html [:nav {:class "navbar navbar-inverse navbar-default" :role "navigation" }
- [ :div {:class "container-fluid"}
-  [:div {:class "navbar-header"}
-   [ :button {:type "button"
-              :class "navbar-toggle"
-              :data-toggle "collapse"
-              :data-target "#bs-example-navbar-collapse-1" }
-    [:span {:class "sr-only"} "Toggle Navigation" ]
-    [:span {:class "icon-bar"}]
-    [:span {:class "icon-bar"}]
-    [:span {:class "icon-bar"}]]]
-  [:div {:class "collapse navbar-collapse js-navbar-controls" :id "navbar-top" } ]]]))
+         [:div {:class "container-fluid"}
+          [:div {:class "navbar-header"}
+           [ :button {:type "button"
+                      :class "navbar-toggle"
+                      :data-toggle "collapse"
+                      :data-target "#bs-example-navbar-collapse-1" }
+            [:span {:class "sr-only"} "Toggle Navigation" ]
+            [:span {:class "icon-bar"}]
+            [:span {:class "icon-bar"}]
+            [:span {:class "icon-bar"}]]
+           [:a {:class "navbar-brand" :href="/"} "touchVision"]]
+         [:div {:class "collapse navbar-collapse js-navbar-controls" :id "navbar-top" } ]]]))
 
 (defn navbar-controls [app owner]
   (reify

@@ -14,12 +14,16 @@
             [client.views.debug :refer [debug-view]]
             [client.views.navbar :refer [navbar-controls]]
             [client.views.options :refer [options-view]]
+            [client.views.downloader :refer [downloader-view]]
             [client.router :as r :refer [create-routes]]
             [client.request :refer [request]]))
 
 (enable-console-print!)
 
 (def app-state (atom {:chan (chan)
+                      :dwnld-chan (chan)
+                      :filtered false
+                      :visible true
                       :options {:running false
                                 :stream :random}
                       :data [] }))
@@ -35,19 +39,16 @@
             (let [m (:message message)
                   type (:type m)
                   data (:data m)]
-              (.log js/console type)
-              (.log js/console data)
               (match type
                      :get identity
                      :post (let [app-data (:data @app-state)
-                                 new-data (conj app-data data) ]
+                                 new-data (conj app-data (-> data
+                                                             (assoc :hidden (:filtered @app-state))
+                                                             (assoc :visible (not (:filtered @app-state)))))]
                              (swap! app-state assoc :data new-data))
                      :put identity
-                     :delete identity
-                     )
-              (.log js/console (:data @app-state))
+                     :delete identity)
               (recur))
-            (.log js/console "no data")
             ))))))
 
 (defn index []
@@ -58,12 +59,12 @@
                (om/build navbar-controls app)
                [:div {:class "container-fluid"}
                 [:div {:class "row"}
-                 [:h1 "touchVision"] ]
-                [:div {:class "row"}
-                 [:div {:class "col-lg-1"}
-                  (om/build options-view  app )]
-                 [:div {:class "col-lg-11"}
-                  (om/build debug-view app)]]
+                 [:div {:class "col-lg-12"}
+                 [:div {:class "col-lg-2"}
+                  (om/build options-view  app )
+                  (om/build downloader-view  app ) ]
+                 [:div {:class "col-lg-10"}
+                  (om/build debug-view app)]]]
                 [:div {:class "row"}
                  (om/build pgm-view app)
                  ]]])))

@@ -8,8 +8,8 @@ import time as t
 
 connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 channel = connection.channel()
-channel.exchange_declare(exchange='touchVision',
-                         type='fanout')
+channel.exchange_declare(exchange='touchvision',
+                         type='direct')
 data = {}
 
 for j in range(1000):
@@ -27,8 +27,8 @@ for j in range(1000):
         'pressure': pressure
         }
     print data
-    channel.basic_publish(exchange='touchVision',
-        routing_key='',
+    channel.basic_publish(exchange='touchvision',
+        routing_key='glove',
         body=json.dumps(data))
     t.sleep(5)
 
