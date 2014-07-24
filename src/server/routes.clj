@@ -23,6 +23,7 @@
 (defroutes api
   (ANY "/" [] h/index)
   (GET "/ws" [] api/data-feed)
+  (ANY "/config" [] h/index)
   (ANY "/switch/mode" [] api/switch-running)
   (ANY "/switch/stream" [] api/switch-stream)
   (ANY "/playback" [] api/start-playback)

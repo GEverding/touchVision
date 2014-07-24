@@ -11,11 +11,12 @@
             [om.dom :as dom :include-macros true]
             [sablono.core :as html :refer-macros [html]]
             [client.views.pgm :refer [pgm-view]]
-            [client.views.debug :refer [debug-view]]
+            [client.views.debug :as debug :refer [debug-view]]
             [client.views.navbar :refer [navbar-controls]]
             [client.views.options :refer [options-view]]
             [client.views.downloader :refer [downloader-view]]
             [client.router :as r :refer [create-routes]]
+            (client.views.config :as c)
             [client.request :refer [request]]))
 
 (enable-console-print!)
@@ -73,7 +74,25 @@
     {:target (sel1 ".js-app")})
   (websocket))
 
-(def routes [{:name "index" :path "" :handler index} ])
+(defn config []
+  (om/root
+    (fn [app owner]
+      (om/component
+        (html [:div
+               (om/build navbar-controls app)
+               [:div {:class "container-fluid"}
+                [:div {:class "row"}
+                 [:div {:class "col-lg-12"}
+                  [:div {:class "col-lg-2"}
+                   (om/build c/side-bar app) ]
+                  [:div {:class "col-lg-10"}
+                   (om/build c/controls  app) ] ]]]])))
+    app-state
+    {:target (sel1 ".js-app")}))
+
+(def routes [{:name "index" :path "" :handler index}
+             {:name "configuration" :path "config" :handler config}
+             ])
 
 (create-routes routes)
 

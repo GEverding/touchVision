@@ -8,7 +8,9 @@
             [cljs.core.async :as async :refer [<! put!]]
             [om.dom :as dom :include-macros true]
             [om.core :as om :include-macros true]
-            [sablono.core :as html :refer-macros [html]]))
+            [sablono.core :as html :refer-macros [html]]
+            [client.router :refer [navigate]]
+            ))
 
 (defn print-data "" [data]
   (str "{ " (map (fn [[k v]] (str k " " v "\n")) data) " }"))
@@ -64,9 +66,22 @@
     om/IRender
     (render [_]
       (html [:div {:class "row debug-view js-debug-view"}
-             (let [data (:data app)]
+             (let [data (-> app :data reverse)]
                (.log js/console data)
                (if-not (empty? data)
                  (om/build-all data-row-view data {:init-state {:chan (:dwnld-chan app)}})
                  (.log js/console "no data"))
                )]))))
+(defn controls [app owner]
+  (reify
+    om/IRender
+    (render [_]
+      (html [:div {:class "col-lg-12"}
+             [:button {:class "btn btn-warning pull-right"
+                       :type "button"
+                       } [:i {:class "fa fa"}] " Reset"]
+             [:button {:class "btn btn-info pull-right"
+                       :type "button"
+                       :on-click (fn [_] (navigate "config"))
+                       } [:i {:class "fa fa-wrench"}] "Configuration"]
+             ]))))
