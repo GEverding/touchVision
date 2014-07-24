@@ -106,7 +106,7 @@
              )))
 
 (defn data-feed [req]
-  (let [rmq-chan (chan)
+  (let [rmq-chan (chan (sliding-buffer 100))
         qname (lq/declare-server-named ch :exclusive true :auto-delete true) ]
     (le/direct ch "touchvision")
     (lq/bind ch qname "touchvision" :routing-key "glove")
