@@ -49,10 +49,13 @@
     (apply handler handler-params)
     ))
 
-(defn navigate [path options]
+(defn navigate
+  ([path]
+   (navigate path {:replace false}))
+  ( [path options]
   (if-let [frag (H/navigate path options)]
     (.log js/console (str "navigating to " frag))
-    false))
+    false)))
 
 (defn create-routes "Create and Start Router" [r]
   (let [paths (map #(:path %) r)

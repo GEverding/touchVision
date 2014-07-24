@@ -92,10 +92,10 @@
         url-clean (if (and (= clean-frag "") (not= url "/"))
                     (subs url 0 (dec (count url)))
                     url) ]
-    (.log js/console (str "fragment " fragment))
-    (.log js/console (str "frag: " frag))
-    (.log js/console (str "frag clean: " clean-frag))
-    (.log js/console (str "url clean: " url-clean))
+    ;; (.log js/console (str "fragment " fragment))
+    ;; (.log js/console (str "frag: " frag))
+    ;; (.log js/console (str "frag clean: " clean-frag))
+    ;; (.log js/console (str "url clean: " url-clean))
     (if (= frag (:fragment @state))
            nil
            (do
