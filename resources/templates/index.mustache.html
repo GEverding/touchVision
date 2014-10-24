@@ -3,7 +3,14 @@
   <!-- http://mustache.github.com/mustache.5.html -->
   <head>
     <!-- partial is just like copy and paste the template here -->
-    {{>partials/header}}
+    <!-- if has title, use the title -->
+    {{#title}}<title>{{title}}</title>{{/title}}
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/css/lib/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/css/lib/bootstrap-theme.min.css" rel="stylesheet"/>
+    <link href="/css/lib/font-awesome.css" rel="stylesheet"/>
+    <link href="/css/main.css" rel="stylesheet"/>
   </head>
   <body>
     <div id="content" class="js-app"></div>

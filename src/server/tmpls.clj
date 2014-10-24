@@ -1,11 +1,12 @@
 (ns server.tmpls
-  (:require [me.shenfeng.mustache :refer [gen-tmpls-from-resources]]
+  (:require [clostache.parser :refer [render-resource]]
             [server.config :refer [cfg]]))
 
 (defn add-info [data]
-  (assoc data
-    :dev? (= (cfg :profile) :dev)
-    :prod? (= (cfg :profile) :prod)))
+  (-> data
+      (assoc :title "touchVision")))
 
-(gen-tmpls-from-resources "templates" [".tpl"] add-info)
-
+(defn index
+  ([] (index {}))
+  ([data]
+   (render-resource "templates/index.mustache.html" (add-info data)) ))
