@@ -1,19 +1,15 @@
 (ns server.handlers.index
-  (:require [liberator.core :refer [defresource]]
+  (:use plumbing.core)
+  (:require [schema.core :as s]
+            [server.tmpls :as tmpls]))
 
-            [taoensso.timbre :as timbre]
-            [clojure.core.match :refer [match]]
-            [cheshire.core :as json]
-            [server.handlers.util :as util]
-            [server.tmpls :as tmpls]
-            ))
+(def index
+  {:status 200
+   :headers {"Content-Type" "text/html"}
+   :body (tmpls/index)})
 
-; Provides useful Timbre aliases in this ns
-(timbre/refer-timbre)
-
-(defresource index
-  :available-media-types ["text/html"]
-  :allowed-methods [:get]
-  :known-content-types #(util/check-content-type %)
-  :handle-ok (fn [_] (tmpls/index)))
+(defnk $GET
+  {:responses {200 s/Any}}
+  []
+  index)
 

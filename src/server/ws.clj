@@ -1,15 +1,15 @@
-(ns server.core
+(ns server.ws
   (:require [org.httpkit.server :refer [run-server]]
             [clojure.tools.cli :refer [cli]]
             [com.stuartsierra.component :as component]
             [taoensso.timbre :as timbre]
-            [server.routes :refer [wrapped-root-handler]]
+            [server.routes :refer [wrapped-ws-app]]
             [server.config :refer [cfg app-configs]]))
 
 ; Provides useful Timbre aliases in this ns
 (timbre/refer-timbre)
 
-(defrecord App [port threads]
+(defrecord WS [port threads capture]
   component/Lifecycle
   (start [this]
     (let [server (get this :app (atom nil)) ]
@@ -17,7 +17,7 @@
         (when-not (nil? @server) (@server))
         ;; start web with app routes
         (reset! server
-                (run-server (wrapped-root-handler {})
+                (run-server (wrapped-ws-app capture)
                             {:port port
                              :thread threads}))
         (assoc this :app server)))
@@ -30,6 +30,6 @@
         (@server :timeout 10)
         (reset! server nil)))))
 
-(defn start-app [port threads]
-  (map->App {:port port :threads threads}))
+(defn start-ws [port threads]
+  (map->WS {:port port :threads threads}))
 

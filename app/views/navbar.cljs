@@ -1,7 +1,6 @@
 3000(ns client.views.navbar
-  (:require-macros [dommy.macros :refer [node sel sel1]])
   (:require [dommy.utils :as utils]
-            [dommy.core :as dommy]
+            [dommy.core :as dommy :refer-macros [sel sel1]]
             [om.core :as om :include-macros true]
             [sablono.core :as html :refer-macros [html]]))
 

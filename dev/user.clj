@@ -9,12 +9,13 @@
             [clojure.string :as str]
             [clojure.test :as test]
             [clojure.tools.namespace.repl :refer (refresh refresh-all)]
+            [com.stuartsierra.component :as component]
             [schema.coerce :as coerce]
             [langohr.core :as rabbit]
             [schema.core :as s]
             [server.core :as jarvis]
-            [server.db :as db]
             [server.system :as system]))
+
 
 (def system
   "A Var containing an object representing the application under
@@ -26,20 +27,20 @@
   #'system."
   []
   ( alter-var-root #'system
-                   (constantly (system/init-system))
-                   )
+                   (constantly (system/system {:port 3000
+                                               :threads 4 })))
   )
 
 (defn start
   "Starts the system running, updates the Var #'system."
   []
-  (alter-var-root #'system system/start))
+  (alter-var-root #'system component/start))
 
 (defn stop
   "Shuts down and destroys the current development system."
   []
   (alter-var-root #'system
-    (fn [s] (when s (system/stop s)))))
+    (fn [s] (when s (component/stop s)))))
 
 (defn go
   "Initializes and starts the system running."

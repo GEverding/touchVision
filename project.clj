@@ -13,6 +13,7 @@
                  [ring/ring-core "1.3.1"]
                  [ring/ring-devel "1.3.1"]
                  [ring/ring-json "0.3.1"]
+                 [ring/ring-defaults "0.1.2"]
                  [http-kit "2.1.19"]
                  [cheshire "5.3.1"]
                  [me.shenfeng/mustache "1.1"]
@@ -20,6 +21,10 @@
                  [clj-time "0.8.0"]
                  [prismatic/schema "0.3.1"]
                  [de.ubercode.clostache/clostache "1.4.0"]
+                 [com.stuartsierra/component "0.2.2"]
+                 [prismatic/fnhouse "0.1.1"]
+                 [prismatic/plumbing "0.3.3"]
+                 [aprint "0.1.0"]
                  ; Client
                  [prismatic/dommy "1.0.0"]
                  [sablono "0.2.22"]

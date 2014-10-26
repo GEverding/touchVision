@@ -1,7 +1,6 @@
 (ns client.views.debug
   (:require-macros [cljs.core.async.macros :refer [go-loop]]
-                   [cljs.core.match.macros :refer [match]]
-                   [dommy.macros :refer [node sel sel1]])
+                   [cljs.core.match.macros :refer [match]])
   (:require [dommy.utils :as utils]
             [dommy.core :as dommy]
             [cljs.core.match :as m]
