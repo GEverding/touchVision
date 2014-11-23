@@ -37,15 +37,15 @@
     (println blob)
     (put! stdin blob )))
 
-(defonce state (atom {}))
 
 (defrecord Capture [mode]
   component/Lifecycle
   (start [this]
-    (let [conn (rmq/connect)
+    (let [state (atom {})
+          conn (rmq/connect)
           ch (lch/open conn)
-          stdin (chan (sliding-buffer 200))
-          stdout (chan (sliding-buffer 200))
+          stdin (chan (sliding-buffer 10))
+          stdout (chan (sliding-buffer 10))
           qname (lq/declare-server-named ch :exclusive true :auto-delete true) ]
       (swap! state assoc :mode mode )
       (le/direct ch "touchvision")
@@ -55,14 +55,15 @@
         [i 0]
         (if (= (:mode @state) :live)
           (let [datom (<! stdin)]
-            (>! stdout (wrap-data datom)))
+            (do
+              (>! stdout (wrap-data datom))))
           (let [datom (gen-fake-data i)]
             (do
-              (println datom)
               (>! stdout (wrap-data datom))
-              (Thread/sleep (+ 1000 (rand-int 200))))))
+              (Thread/sleep (+ 1000 (rand-int 2000))))))
         (recur (inc i)))
       (-> this
+          (assoc :state state)
           (assoc :mode mode)
           (assoc :stdout stdout)
           (assoc :stdin stdin)
@@ -72,16 +73,14 @@
     (rmq/close (:rmq-conn this))
     (close! (:stdin this))
     (close! (:stdout this))
-    (swap! state {})
+    (swap! (:state this) {})
     (-> this
         (assoc :mode nil)
-        (assoc :stdin nil)
-        (assoc :stdout nil)
+        ;; (assoc :stdin nil)
+        ;; (assoc :stdout nil)
         (assoc :rmq-conn nil)
+        (assoc :state (atom {}))
         (assoc :rmq-ch nil))))
-
-(defn set-mode! [this new-mode]
-  (swap! state :mode new-mode))
 
 (defn capture-start [mode]
   (map->Capture {:mode mode}))

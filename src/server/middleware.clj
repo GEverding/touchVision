@@ -1,6 +1,7 @@
 (ns server.middleware
+  (:use plumbing.core)
   (:require [taoensso.timbre :as timbre]
-            [ring.middleware.defaults :refer [site-defaults wrap-defaults api-defaults]]
+            [ring.middleware.defaults :refer [site-defaults wrap-defaults]]
             [ring.middleware.params :as params]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
             [ring.util.response :refer [response status content-type]]
@@ -31,10 +32,11 @@
           res (handler request)
           status (:status res) ]
       (do
-        (when (json-request? request)
+        ;(when (json-request? request)
           (aprint request)
           (debug (str "["logger"]") method status uri (if (nil? params) "" params) )
-          (aprint res))
+          (aprint res)
+          ;)
         res))))
 
 (defn wrap-stacktrace
@@ -55,20 +57,23 @@
                 (status 500)
                 (content-type "text/html"))))))))
 
+(defn- keywordize-middleware [handler]
+  (fn [req]
+    (handler
+     (update-in req [:query-params] keywordize-map))))
+
+(defn wrap-resources [handler resources]
+  (fn [request]
+  (-> request
+      (assoc :resources resources)
+      handler )))
+
 (defn wrap-middleware "Ring Middleware Builder" [handler]
   (-> handler
       (wrap-defaults middleware-config)
       (wrap-json-body {:keywords? true})
       (request-logger "app")
-      params/wrap-params
-      wrap-json-response
-      wrap-stacktrace))
-
-(defn wrap-ws-middleware "Ring Middleware Builder for WebSockets" [handler]
-  (-> handler
-      (wrap-defaults api-defaults)
-      (wrap-json-body {:keywords? true})
-      (request-logger "capture")
+      keywordize-middleware
       params/wrap-params
       wrap-json-response
       wrap-stacktrace))

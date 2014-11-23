@@ -2,7 +2,7 @@
   :description ""
   :url "https://github.com/GEverding/touchVision"
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/core.async "0.1.303.0-886421-alpha"]
+                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [org.clojure/clojurescript "0.0-2371"]
                  [org.clojure/tools.cli "0.3.1"]
                  [org.clojure/clojure-contrib "1.2.0"]
@@ -22,7 +22,6 @@
                  [prismatic/schema "0.3.1"]
                  [de.ubercode.clostache/clostache "1.4.0"]
                  [com.stuartsierra/component "0.2.2"]
-                 [prismatic/fnhouse "0.1.1"]
                  [prismatic/plumbing "0.3.3"]
                  [aprint "0.1.0"]
                  ; Client
@@ -32,8 +31,8 @@
                  [cljs-ajax "0.3.3"]
                  [prismatic/om-tools "0.3.6"]
                  [com.andrewmcveigh/cljs-time "0.2.2"]
-                 [jarohen/chord "0.4.2"]
-                 [om "0.8.0-alpha1"]]
+                 [jarohen/chord "0.4.2" :exclusions [org.clojure/clojure]]
+                 [om "0.8.0-alpha2"]]
   :plugins [[lein-cljsbuild "1.0.3"]
             [lein-shell "0.3.0"]
             [codox "0.8.9"]

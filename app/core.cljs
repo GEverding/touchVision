@@ -1,9 +1,7 @@
 (ns client.core
-  (:require-macros [cljs.core.match.macros :refer [match]]
-                   [cljs.core.async.macros :refer [go]])
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [dommy.utils :as utils]
-            [chord.client :refer [ws-ch]]
-            [cljs.core.async :as async :refer [<! >! chan pipe]]
+            [cljs.core.async :as async :refer [<! >! chan sub take! sliding-buffer]]
             [cljs.core.match :as m]
             [dommy.core :refer-macros [sel sel1]]
             [om.core :as om :include-macros true]
@@ -14,41 +12,13 @@
             [client.views.navbar :refer [navbar-controls]]
             [client.views.options :refer [options-view]]
             [client.views.downloader :refer [downloader-view]]
-            [client.router :as r :refer [create-routes]]
+            [client.ws :as ws]
             [client.request :refer [request]]))
 
 (enable-console-print!)
 
-(def app-state (atom {:chan (chan)
-                      :dwnld-chan (chan)
-                      :filtered false
-                      :visible true
-                      :options {:running false
-                                :stream :random}
-                      :data [] }))
+(def app-state (atom nil))
 
-(defn websocket "init" []
-  (go
-    (let [{:keys [ws-channel error]} (<! (ws-ch "ws://localhost:3001/ws"
-                                                {:format :edn}))
-          app-chan (:chan @app-state)]
-      (if-not error
-        (loop []
-          (if-let [message (<! ws-channel)]
-            (let [m (:message message)
-                  type (:type m)
-                  data (:data m)]
-              (match type
-                     :get identity
-                     :post (let [app-data (:data @app-state)
-                                 new-data (conj app-data (-> data
-                                                             (assoc :hidden (:filtered @app-state))
-                                                             (assoc :visible (not (:filtered @app-state)))))]
-                             (swap! app-state assoc :data new-data))
-                     :put identity
-                     :delete identity)
-              (recur))
-            ))))))
 
 (defn index []
   (om/root
@@ -72,9 +42,15 @@
 
     app-state
     {:target (sel1 ".js-app")})
-  (websocket))
+  )
 
-(def routes [{:name "index" :path "" :handler index} ])
+(defn main []
+  (let [stream (ws/start!)
+        ch (chan (sliding-buffer 25))]
+    (go
+      (let [subscriber (sub stream :post ch)]
+        (loop [m (<! ch)]
+          (println (:data m))
+          (recur (<! ch)))))))
 
-(create-routes routes)
-
+(main)

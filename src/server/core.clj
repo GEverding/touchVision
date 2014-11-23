@@ -3,13 +3,13 @@
             [clojure.tools.cli :refer [cli]]
             [com.stuartsierra.component :as component]
             [taoensso.timbre :as timbre]
-            [server.routes :refer [wrapped-root-handler]]
+            [server.routes :refer [wrap-app]]
             [server.config :refer [cfg app-configs]]))
 
 ; Provides useful Timbre aliases in this ns
 (timbre/refer-timbre)
 
-(defrecord App [port threads]
+(defrecord App [port threads capture]
   component/Lifecycle
   (start [this]
     (let [server (get this :app (atom nil)) ]
@@ -17,7 +17,7 @@
         (when-not (nil? @server) (@server))
         ;; start web with app routes
         (reset! server
-                (run-server (wrapped-root-handler {})
+                (run-server (wrap-app {:capture capture})
                             {:port port
                              :thread threads}))
         (assoc this :app server)))

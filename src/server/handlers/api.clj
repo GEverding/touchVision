@@ -1,7 +1,6 @@
 (ns server.handlers.api
   (:use plumbing.core)
-  (:require
-            [clojure.java.io :as io]
+  (:require [clojure.java.io :as io]
             [chord.http-kit :refer [with-channel]]
             [clj-time.core :as t]
             [clj-time.coerce :as c]
@@ -9,7 +8,7 @@
             [taoensso.timbre :as timbre]
             [cheshire.core :as json :refer [decode encode generate-string]]
             [server.handlers.util :refer :all]
-            [server.capture.core :refer capture]
+            [server.capture.core :as capture]
             [server.config :refer [cfg]]))
 
 

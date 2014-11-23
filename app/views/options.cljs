@@ -46,13 +46,13 @@
   (reify
     om/IInitState
     (init-state [_]
-      {:stream :fake})
+      ;; FIXME should be passed in
+      {:mode :fake})
     om/IRenderState
     (render-state [_ state]
-      (let [current-active (:stream state)
+      (let [current-mode (:mode state)
             c (:stream-chan state)
-            is-active? (fn [btn] (= btn current-active)) ]
-        (.log js/console "rendering switch")
+            is-active? (fn [mode] (= mode (:mode state))) ]
         (html [:div {:class "switch-container"}
                [:button {:type "button"
                          :class (str "btn btn-info col-lg-6 "
@@ -60,7 +60,7 @@
                                        "active"
                                        ""))
                          :ref "live"
-                        :on-click #(handle-change app owner c :stream :live )
+                        :on-click #(handle-change app owner c :mode :live )
                          } "Live"]
                [:button {:type "button"
                          :class (str "btn btn-info col-lg-6 "
@@ -68,7 +68,7 @@
                                        "active"
                                        ""))
                          :ref "fake"
-                        :on-click #(handle-change app owner c :stream :fake )
+                        :on-click #(handle-change app owner c :mode :fake )
                          } "Fake"]]
               )))))
 
