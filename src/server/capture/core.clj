@@ -11,6 +11,8 @@
             [taoensso.timbre :as timbre]
             [cheshire.core :refer [decode encode]]))
 
+(defn uuid [] (str (java.util.UUID/randomUUID)))
+
 (timbre/refer-timbre)
 
 (defn ^:private random-date [start end]
@@ -23,7 +25,7 @@
 
 (defn ^:private wrap-data [data]
   {:type :post
-   :data data})
+   :data (merge  data {:id (uuid)})})
 
 (defn ^:private gen-fake-data [i]
    {:x (rand 100)
