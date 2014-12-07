@@ -8,7 +8,7 @@
             [om.dom :as dom :include-macros true]
             [sablono.core :as html :refer-macros [html]]
             [client.views.pgm :refer [pgm-view]]
-            [client.views.debug :refer [debug-view]]
+            [client.views.visualizer :refer [->visualizer-view]]
             [client.views.navbar :refer [navbar-controls]]
             [client.views.options :refer [options-view]]
             [client.views.downloader :refer [downloader-view]]
@@ -20,7 +20,7 @@
 (def app-state (atom nil))
 
 
-(defn index []
+(defn index [ws-chan]
   (om/root
     (fn [app owner]
       (om/component
@@ -32,16 +32,18 @@
                 [:div {:class "row"}
                  [:div {:class "col-md-12"}
                  [:div {:class "col-md-2"}
-                  (om/build options-view  app )
-                  (om/build downloader-view  app ) ]
+                  ;; (om/build options-view  app )
+                  ;; (om/build downloader-view  app )
+                  ]
                  [:div {:class "col-md-10"}
-                  (om/build debug-view app)]]]
+                  (->visualizer-view app)
+                  ]]]
                 [:div {:class "row"}
-                 (om/build pgm-view app)
+                 ;; (om/build pgm-view app)
                  ]]])))
-
     app-state
-    {:target (sel1 ".js-app")})
+    {:target (sel1 ".js-app")
+     :shared {:ws-chan ws-chan} })
   )
 
 (defn main []
@@ -54,6 +56,7 @@
             (do
               (println (:data m))
               (recur (<! ch)))))))
+    (index stream)
     ))
 
 (main)

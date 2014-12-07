@@ -9,8 +9,7 @@
             [om.dom :as dom :include-macros true]
             [om.core :as om :include-macros true]
             [sablono.core :as html :refer-macros [html]]
-            [client.request :refer [request]]
-            ))
+            [client.request :refer [request]]))
 
 (defn- success [res]
   (.log js/console "done!"))
