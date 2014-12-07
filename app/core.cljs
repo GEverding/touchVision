@@ -19,8 +19,7 @@
 
 (def app-state (atom nil))
 
-
-(defn index [ws-chan]
+(defn index [ws-chan select-chan]
   (om/root
     (fn [app owner]
       (om/component
@@ -43,11 +42,14 @@
                  ]]])))
     app-state
     {:target (sel1 ".js-app")
-     :shared {:ws-chan ws-chan} })
+     :shared {:ws-chan ws-chan
+              :select-chan select-chan
+              } })
   )
 
 (defn main []
   (let [stream (ws/start!)
+        select-chan (chan)
         ch (chan (sliding-buffer 25))]
     (go
       (let [subscriber (sub stream :post ch)]
@@ -56,7 +58,6 @@
             (do
               (println (:data m))
               (recur (<! ch)))))))
-    (index stream)
-    ))
+    (index stream select-chan)))
 
 (main)

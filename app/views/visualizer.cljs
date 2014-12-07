@@ -56,8 +56,9 @@
             (recur (<! ch)))) )))
   (render-state
     [_ state]
-    (html [:div {:class "row visuilizer-view js-visulizer-view"}
+    (html [:div {:class "row visualizer-view js-visualizer-view"}
            (let [datoms (:datoms state)]
              (if-not (empty? datoms)
                (om/build-all data-row-view datoms {:key :id})
                (.log js/console "no data")))])))
+

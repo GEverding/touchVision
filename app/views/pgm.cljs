@@ -1,9 +1,9 @@
 (ns client.views.pgm
-  (:require-macros [cljs.core.async.macros :refer [go]] )
+  (:require-macros [cljs.core.async.macros :refer [go-loop]] )
   (:require [strokes :refer [d3]]
             [dommy.utils :as utils]
             [dommy.core :as dommy]
-            [cljs.core.async :as async :refer [<! >! chan put! sub]]
+            [cljs.core.async :as async :refer [<! >! chan put! sub sliding-buffer]]
             [om-tools.core :refer-macros (defcomponent)]
             [om.dom :as dom :include-macros true]
             [om.core :as om :include-macros true]
@@ -17,7 +17,6 @@
                                  "#009BDD"])
 
 (strokes/bootstrap)
-
 
 (defn ^:private brushed [app owner]
   (let [brush (om/get-state owner :brush)
@@ -34,24 +33,37 @@
 (defcomponent graph [app owner opts]
     (init-state
       [_]
-      (let [data (:data app)
-            width (:width opts)
+      (let [width (:width opts)
             height (:height opts)
             x (-> d3 .-scale (.linear) (.range [0 width]))
             y (-> d3 .-scale (.linear) (.range [height 0])) ]
-        {:width width
-         :height height
-         :margin (:margin opts)
-         :x x :y y
-         :brush (-> d3 .-svg (.brush) (.x x))
-         :x-axis (-> d3 .-svg (.axis) (.scale x) (.orient "bottom"))
-         :y-axis (-> d3 .-svg (.axis) (.scale y) (.orient "left"))}))
+        {:d3-props
+         {:width width
+          :height height
+          :margin (:margin opts)
+          :x x :y y
+          :brush (-> d3 .-svg (.brush) (.x x))
+          :x-axis (-> d3 .-svg (.axis) (.scale x) (.orient "bottom"))
+          :y-axis (-> d3 .-svg (.axis) (.scale y) (.orient "left"))}
+         :datoms []}))
+  (will-mount
+    [_]
+    (let [ws (:ws-chan (om/get-shared owner))
+          ch (chan (sliding-buffer 25))]
+      (sub ws :post ch)
+      (go-loop
+        [m (<! ch)]
+        (when m
+          (do
+            (.log js/console m)
+            (om/update-state! owner :datoms #(conj % (:data m)))
+            (recur (<! ch)))) )))
     (did-mount
       [this]
       (let [brushg (om/get-node owner "brush")
-            height (om/get-state owner :height)
-            x-axis (om/get-state owner :x-axis)
-            brush (om/get-state owner :brush)]
+            height (om/get-state owner [:d3-props :height])
+            x-axis (om/get-state owner [:d3-props :x-axis])
+            brush (om/get-state owner [:d3-props :brush])]
         (-> d3
             (.select brushg)
             (.call brush)
@@ -63,31 +75,29 @@
             (.call x-axis))
         (-> brush
             (.on "brushend" (partial brushed app owner)))))
+    ;; (did-update [this prev-props prev-state])
     (render-state
-      [_ {:keys [x y width height]}]
-      (let [data (:data app)
-            domain (vec (->> data
-                              (filter #(:visible %))
-                              (map (fn [{:keys [timestamp]}] timestamp))  )) ]
-        (println (clj->js domain))
-        (-> x (.domain
-                (-> d3 (.extent (clj->js domain) ))))
-        (-> y (.domain [0 1]))
-        (.log js/console (x))
-        (html [:svg {:height height
-                     :width width
-                     :ref "svg"}
-               [:g {:class "data"}
-                (->> data
-                     (filter #(:visible %))
-                     (map (fn [{:keys [pressure timestamp]}]
-                            [:rect {:style {:fill (nth pressure-colours (int pressure)) }
-                                    :height height
-                                    :width 2
-                                    :x (x timestamp)}]))) ]
-               [:g {:class "x axis" :ref "x-axis"}]
+      [_ {:keys [d3-props datoms]}]
+      (let [{:keys [x y width height]} d3-props]
+        (html [:svg {:height (+ height 30) :width width :ref "svg"}
+               (when (< 0 (count datoms))
+                 (let [domain (->> datoms
+                                   ;(filter #(:visible %))
+                                   (mapv (fn [{:keys [timestamp]}] timestamp)))]
+                   (println (clj->js domain))
+                   (-> x (.domain
+                           (-> d3 (.extent (clj->js domain) ))))
+                   (-> y (.domain [0 1]))
+                   [:g {:class "data"}
+                    (->> datoms
+                         ;(filter #(:visible %))
+                         (map (fn [{:keys [pressure timestamp]}]
+                                [:rect {:style {:fill (nth pressure-colours (int pressure)) }
+                                        :height height
+                                        :width 2
+                                        :x (x timestamp)}]))) ]))
+               [:g {:class "x axis" :transform (str "translate(0," height ")") :ref "x-axis"}]
                [:g {:class "brush" :ref "brush"}]]))))
-
 
 (defcomponent pgm-view [app owner]
   (render
