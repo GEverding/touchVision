@@ -7,8 +7,8 @@
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
             [sablono.core :as html :refer-macros [html]]
-            [client.views.pgm :refer [pgm-view]]
-            [client.views.visualizer :refer [->visualizer-view]]
+            [client.views.pgm :refer (->pgm-view)]
+            [client.views.visualizer :refer (->visualizer-view)]
             [client.views.navbar :refer [navbar-controls]]
             [client.views.options :refer [options-view]]
             [client.views.downloader :refer [downloader-view]]
@@ -39,7 +39,7 @@
                   (->visualizer-view app)
                   ]]]
                 [:div {:class "row"}
-                 ;; (om/build pgm-view app)
+                 (->pgm-view app)
                  ]]])))
     app-state
     {:target (sel1 ".js-app")

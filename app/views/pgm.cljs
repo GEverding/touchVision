@@ -3,12 +3,18 @@
   (:require [strokes :refer [d3]]
             [dommy.utils :as utils]
             [dommy.core :as dommy]
-            [cljs.core.async :as async :refer [<! >! chan put!]]
+            [cljs.core.async :as async :refer [<! >! chan put! sub]]
+            [om-tools.core :refer-macros (defcomponent)]
             [om.dom :as dom :include-macros true]
             [om.core :as om :include-macros true]
             [sablono.core :as html :refer-macros [html]]))
 
-(def pressure-colours ["#A52A2A" "#C25051" "#E09432" "#EFBD2E" "#73B845" "#009BDD"])
+(def ^:private pressure-colours ["#A52A2A"
+                                 "#C25051"
+                                 "#E09432"
+                                 "#EFBD2E"
+                                 "#73B845"
+                                 "#009BDD"])
 
 (strokes/bootstrap)
 
@@ -25,10 +31,9 @@
              :brush-empty? brush-empty?})
     true))
 
-(defn graph [app owner opts]
-  (reify
-    om/IInitState
-    (init-state [_]
+(defcomponent graph [app owner opts]
+    (init-state
+      [_]
       (let [data (:data app)
             width (:width opts)
             height (:height opts)
@@ -41,9 +46,8 @@
          :brush (-> d3 .-svg (.brush) (.x x))
          :x-axis (-> d3 .-svg (.axis) (.scale x) (.orient "bottom"))
          :y-axis (-> d3 .-svg (.axis) (.scale y) (.orient "left"))}))
-
-    om/IDidMount
-    (did-mount [this]
+    (did-mount
+      [this]
       (let [brushg (om/get-node owner "brush")
             height (om/get-state owner :height)
             x-axis (om/get-state owner :x-axis)
@@ -59,9 +63,8 @@
             (.call x-axis))
         (-> brush
             (.on "brushend" (partial brushed app owner)))))
-
-    om/IRenderState
-    (render-state [_ {:keys [x y width height]}]
+    (render-state
+      [_ {:keys [x y width height]}]
       (let [data (:data app)
             domain (vec (->> data
                               (filter #(:visible %))
@@ -83,21 +86,19 @@
                                     :width 2
                                     :x (x timestamp)}]))) ]
                [:g {:class "x axis" :ref "x-axis"}]
-               [:g {:class "brush" :ref "brush"}]
-               ]) ) )))
+               [:g {:class "brush" :ref "brush"}]]))))
 
 
-(defn pgm-view [app owner]
-  (reify
-    om/IRender
-    (render [_]
-      (let [margin {:top 10 :right 40 :bottom 100 :left 40}
-            height (- 200 (:top margin) (:bottom margin))
-            width  (- (-> js/window .-innerWidth) (:left margin) (:right margin)) ]
-        (html [:div {:class "pgm-container js-graph-view"}
-               (om/build graph app {:opts {:width width
-                                           :height height
-                                           :margin margin }})
+(defcomponent pgm-view [app owner]
+  (render
+    [_]
+    (let [margin {:top 10 :right 40 :bottom 100 :left 40}
+          height (- 200 (:top margin) (:bottom margin))
+          width  (- (-> js/window .-innerWidth) (:left margin) (:right margin)) ]
+      (html [:div {:class "pgm-container js-graph-view"}
+             (om/build graph app {:opts {:width width
+                                         :height height
+                                         :margin margin }})
 
-               ])))))
+             ]))))
 
