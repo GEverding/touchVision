@@ -50,7 +50,10 @@
     (go
       (let [subscriber (sub stream :post ch)]
         (loop [m (<! ch)]
-          (println (:data m))
-          (recur (<! ch)))))))
+          (when m
+            (do
+              (println (:data m))
+              (recur (<! ch)))))))
+    ))
 
 (main)

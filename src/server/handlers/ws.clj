@@ -15,8 +15,7 @@
       (let [stdout (:stdout capture)]
         (go
           (loop [datom (<! stdout)]
-                  (println "datom: " datom)
-                  (if datom
+                  (when datom
                     (if (= (:stream @state) :open)
                       (when (>! ws-ch datom)
                         (recur (<! stdout)))
