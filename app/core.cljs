@@ -43,9 +43,7 @@
     app-state
     {:target (sel1 ".js-app")
      :shared {:ws-chan ws-chan
-              :select-chan select-chan
-              } })
-  )
+              :select-chan select-chan }}))
 
 (defn main []
   (let [stream (ws/start!)
@@ -56,7 +54,7 @@
         (loop [m (<! ch)]
           (when m
             (do
-              (println (:data m))
+              (.debug js/console "main: " (:data m))
               (recur (<! ch)))))))
     (index stream select-chan)))
 

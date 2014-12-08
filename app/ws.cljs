@@ -20,8 +20,7 @@
               (let [{:keys [message error]} payload
                     datom {:type (:type message)
                            :data (:data message)}]
-                (.log js/console message)
-                (.error js/console error)
+                (.debug js/console message)
                 (if error
                   (do
                     (.error js/console error)

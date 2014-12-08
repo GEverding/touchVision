@@ -19,15 +19,13 @@
 (strokes/bootstrap)
 
 (defn ^:private brushed [app owner]
-  (let [brush (om/get-state owner :brush)
+  (let [brush (om/get-state owner [:d3-props :brush])
         rng (.extent brush)
-        c (:chan @app)
+        ch (:select-chan (om/get-shared owner))
         brush-empty? (.empty brush)
         low (nth rng 0)
         high (nth rng 1) ]
-    (put! c {:low low
-             :high high
-             :brush-empty? brush-empty?})
+    (put! ch {:low low :high high})
     true))
 
 (defcomponent graph [app owner opts]
@@ -55,7 +53,7 @@
         [m (<! ch)]
         (when m
           (do
-            (.log js/console m)
+            (.debug js/console m)
             (om/update-state! owner :datoms #(conj % (:data m)))
             (recur (<! ch)))) )))
     (did-mount
@@ -84,7 +82,7 @@
                  (let [domain (->> datoms
                                    ;(filter #(:visible %))
                                    (mapv (fn [{:keys [timestamp]}] timestamp)))]
-                   (println (clj->js domain))
+                   ;; (println (clj->js domain))
                    (-> x (.domain
                            (-> d3 (.extent (clj->js domain) ))))
                    (-> y (.domain [0 1]))

@@ -41,19 +41,25 @@
                   } (print-data data)]) ) )
 
 (defcomponent visualizer-view [app owner]
-  (init-state [this] {:datoms [] })
+  (init-state
+    [this]
+    {:datoms []
+     :time-bound {:low nil :high nil}})
   (will-mount
     [_]
-    (let [ws (:ws-chan (om/get-shared owner))
-          ch (chan (sliding-buffer 25))]
-      (sub ws :post ch)
+    (let [{:keys [ws-chan select-chan]} (om/get-shared owner)
+          ws-sub (chan (sliding-buffer 25))]
+      (sub ws-chan :post ws-sub)
       (go-loop
-        [m (<! ch)]
+        [[m c] (alts! [ws-sub select-chan])]
+        (println c)
         (when m
-          (do
-            (.log js/console m)
-            (om/update-state! owner :datoms #(conj % m))
-            (recur (<! ch)))) )))
+          (condp = c
+            ws-sub (om/update-state! owner :datoms #(conj % m))
+            select-chan (do
+                          (.info js/console "select")
+                          (om/set-state! owner :time-bound m)))
+          (recur (alts! [ws-sub select-chan]))))))
   (render-state
     [_ state]
     (html [:div {:class "row visualizer-view js-visualizer-view"}
