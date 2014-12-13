@@ -73,7 +73,12 @@
             (.call x-axis))
         (-> brush
             (.on "brushend" (partial brushed app owner)))))
-    ;; (did-update [this prev-props prev-state])
+    (did-update
+      [_ _ _]
+      (let [x-axis (om/get-state owner [:d3-props :x-axis])]
+        (-> d3
+            (.select (om/get-node owner "x-axis"))
+            (.call x-axis))))
     (render-state
       [_ {:keys [d3-props datoms]}]
       (let [{:keys [x y width height]} d3-props]

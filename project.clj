@@ -32,7 +32,7 @@
                  [prismatic/om-tools "0.3.6"]
                  [com.andrewmcveigh/cljs-time "0.2.4"]
                  [jarohen/chord "0.5.0-SNAPSHOT" :exclusions [org.clojure/clojure]]
-                 [om "0.8.0-beta2"]]
+                 [om "0.8.0-beta3"]]
   :plugins [[lein-cljsbuild "1.0.3"]
             [lein-shell "0.3.0"]
             [codox "0.8.9"]
