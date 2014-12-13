@@ -4,6 +4,7 @@
             [dommy.utils :as utils]
             [dommy.core :as dommy]
             [cljs.core.async :as async :refer [<! >! chan put! sub sliding-buffer]]
+            [cljs-log.core :as log]
             [om-tools.core :refer-macros (defcomponent)]
             [om.dom :as dom :include-macros true]
             [om.core :as om :include-macros true]
@@ -17,6 +18,7 @@
                                  "#009BDD"])
 
 (strokes/bootstrap)
+(defonce ^:private l (log/get-logger "pgm"))
 
 (defn ^:private brushed [app owner]
   (let [brush (om/get-state owner [:d3-props :brush])
@@ -53,7 +55,7 @@
         [m (<! ch)]
         (when m
           (do
-            (.debug js/console m)
+            (log/finest l m)
             (om/update-state! owner :datoms #(conj % (:data m)))
             (recur (<! ch)))) )))
     (did-mount

@@ -2,16 +2,19 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require
             [chord.client :refer [ws-ch]]
+            [cljs-log.core :as log]
             [cljs.core.async :as async :refer [<! >! chan pub close! put! sliding-buffer]]
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
             [client.request :refer [request]]))
 
+(def ^:private l (log/get-logger "ws"))
+
 ;; stdout is a publisher channel
 (defn- listen []
   (let [out (chan (sliding-buffer 25))
         stdout (pub out :type)]
-    (.log js/console "starting Websocket listener")
+    (log/info l "starting Websocket listener")
     (go
       (let [{:keys [ws-channel error]} (<! (ws-ch "ws://localhost:3000/ws" {:format :edn})) ]
         (if-not error
@@ -20,15 +23,17 @@
               (let [{:keys [message error]} payload
                     datom {:type (:type message)
                            :data (:data message)}]
-                (.debug js/console message)
+                (log/finest l message)
                 (if error
                   (do
-                    (.error js/console error)
+                    (log/warning l error)
                     (close! out))
                   (do
                     (put! out datom)
                     (recur (<! ws-channel)))))))
-          (.error js/console "ws throw an error: " error))))
+          (do
+          (log/severe l "*** ws throw an error ***")
+          (log/severe l error)))))
       stdout))
 
 (defn start! "start websocket" []

@@ -7,6 +7,7 @@
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
             [sablono.core :as html :refer-macros [html]]
+            [cljs-log.core :as log]
             [client.views.pgm :refer (->pgm-view)]
             [client.views.visualizer :refer (->visualizer-view)]
             [client.views.navbar :refer [navbar-controls]]
@@ -45,16 +46,19 @@
      :shared {:ws-chan ws-chan
               :select-chan select-chan }}))
 
+(def l (log/get-logger "core"))
+
 (defn main []
   (let [stream (ws/start!)
         select-chan (chan)
         ch (chan (sliding-buffer 25))]
+    (log/start-display (log/console-output))
     (go
       (let [subscriber (sub stream :post ch)]
         (loop [m (<! ch)]
           (when m
             (do
-              (.debug js/console "main: " (:data m))
+              (log/finest l (:data m))
               (recur (<! ch)))))))
     (index stream select-chan)))
 
