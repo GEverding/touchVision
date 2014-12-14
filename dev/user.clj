@@ -10,11 +10,21 @@
             [clojure.test :as test]
             [clojure.tools.namespace.repl :refer (refresh refresh-all)]
             [com.stuartsierra.component :as component]
+            [environ.core :refer (env)]
             [schema.coerce :as coerce]
             [langohr.core :as rabbit]
             [server.core :as jarvis]
-            [server.system :as system]))
+            [server.system :as system]
+            [server.db.queries :as q]))
 
+(def db-spec {:classname "org.postgresql.Driver"
+              :subprotocol "postgresql"
+              :subname (str "//localhost:5432/" (env :pg-db))
+              :user (env :pg-user)
+              :password (env :pg-pass)
+              :init-pool-size 2
+              :max-pool-size 20
+              :partitions 1})
 
 (def system
   "A Var containing an object representing the application under
@@ -27,7 +37,8 @@
   []
   ( alter-var-root #'system
                    (constantly (system/system {:port 3000
-                                               :threads 4 })))
+                                               :threads 4
+                                               :db-spec db-spec })))
   )
 
 (defn start
