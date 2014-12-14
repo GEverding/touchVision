@@ -24,8 +24,7 @@
 
 (defn configure-ws [req]
   (let [{:keys [mode stream]} (:query-params req)
-        caputre (-> req :resources :capture)
-        ]
+        caputre (-> req :resources :capture) ]
     (dosync
       (swap! (:state caputre) assoc :mode (keyword mode))
       (swap! state assoc :stream (keyword stream)))

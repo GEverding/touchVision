@@ -32,15 +32,16 @@
                  [prismatic/om-tools "0.3.6"]
                  [com.andrewmcveigh/cljs-time "0.2.4"]
                  [jarohen/chord "0.5.0-SNAPSHOT" :exclusions [org.clojure/clojure]]
-                 [om "0.8.0-beta3"]]
-  :plugins [[lein-cljsbuild "1.0.3"]
+                 [om "0.8.0-beta3"]
+                 [GEverding/cljs-log "0.1.0-SNAPSHOT"]]
+  :plugins [[lein-cljsbuild "1.0.4-SNAPSHOT"]
             [lein-shell "0.3.0"]
             [codox "0.8.9"]
             [lein-cooper "0.0.1"] ]
   :source-paths ["src"]
   :test-paths ["test"]
-  :repl-options {:init-ns user }
   :repositories {"sonatype-oss-public" "https://oss.sonatype.org/content/groups/public/"}
+  :repl-options {:init-ns user}
   :profiles { :dev {:source-paths ["dev" "src"]
                     :plugins [[lein-midje "3.1.3"]]
                     :dependencies [[org.clojure/tools.namespace "0.2.8-SNAPSHOT"]
@@ -73,9 +74,4 @@
                                     "resources/public/js/lib/d3.min.js"
                                     "react/externs/react.js" ] }}
              ]}
-  :aliases  {"bower" ["shell" "bower" "install"]
-             "scss" ["shell" "compass" "compile"]
-             "dist" ["with-profile" "prod" "do" "bower," "uberjar," "cljsbuild" "once" "prod," "scss," "resource"]
-             }
-  :clean-targets [:target-path :compile-path "dist"]
-  )
+  :clean-targets [:target-path :compile-path "dist"])
