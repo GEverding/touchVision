@@ -8,7 +8,8 @@
             [om-tools.core :refer-macros (defcomponent)]
             [om.dom :as dom :include-macros true]
             [om.core :as om :include-macros true]
-            [sablono.core :as html :refer-macros [html]]))
+            [sablono.core :as html :refer-macros [html]]
+            [client.views.visualizer :refer (hide?)]))
 
 (def ^:private pressure-colours ["#A52A2A"
                                  "#C25051"
@@ -26,8 +27,16 @@
         ch (:select-chan (om/get-shared owner))
         brush-empty? (.empty brush)
         low (nth rng 0)
-        high (nth rng 1) ]
-    (put! ch {:low low :high high})
+        high (nth rng 1)]
+    (log/fine l {:low low :high high})
+    (if brush-empty?
+      (do
+        (put! ch {:low (.-MIN_VALUE js/Number) :high (.-MAX_VALUE js/Number)})
+        (om/set-state! owner :paused? false))
+      (do
+        (put! ch {:low low :high high})
+        (om/set-state! owner :paused? true)
+        (om/set-state! owner :visible-datoms (om/get-state owner :all-datoms))))
     true))
 
 (defcomponent graph [app owner opts]
@@ -45,7 +54,10 @@
           :brush (-> d3 .-svg (.brush) (.x x))
           :x-axis (-> d3 .-svg (.axis) (.scale x) (.orient "bottom"))
           :y-axis (-> d3 .-svg (.axis) (.scale y) (.orient "left"))}
-         :datoms []}))
+         :visible-datoms []
+         :all-datoms []
+         :paused? false
+         }))
   (will-mount
     [_]
     (let [ws (:ws-chan (om/get-shared owner))
@@ -55,8 +67,7 @@
         [m (<! ch)]
         (when m
           (do
-            (log/finest l m)
-            (om/update-state! owner :datoms #(conj % (:data m)))
+            (om/update-state! owner :all-datoms #(conj % (:data m)))
             (recur (<! ch)))) )))
     (did-mount
       [this]
@@ -82,8 +93,9 @@
             (.select (om/get-node owner "x-axis"))
             (.call x-axis))))
     (render-state
-      [_ {:keys [d3-props datoms]}]
-      (let [{:keys [x y width height]} d3-props]
+      [_ {:keys [d3-props visible-datoms all-datoms paused?]}]
+      (let [datoms (if (not paused?) all-datoms visible-datoms)
+            {:keys [x y width height]} d3-props]
         (html [:svg {:height (+ height 30) :width width :ref "svg"}
                (when (< 0 (count datoms))
                  (let [domain (->> datoms
@@ -95,12 +107,11 @@
                    (-> y (.domain [0 1]))
                    [:g {:class "data"}
                     (->> datoms
-                         ;(filter #(:visible %))
                          (map (fn [{:keys [pressure timestamp]}]
                                 [:rect {:style {:fill (nth pressure-colours (int pressure)) }
                                         :height height
                                         :width 2
-                                        :x (x timestamp)}]))) ]))
+                                        :x (x timestamp)}])))]))
                [:g {:class "x axis" :transform (str "translate(0," height ")") :ref "x-axis"}]
                [:g {:class "brush" :ref "brush"}]]))))
 
