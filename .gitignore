@@ -3,7 +3,7 @@
 
 # KDE directory preferences
 .directory
-
+.root
 
 ### OSX ###
 .DS_Store
