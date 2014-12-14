@@ -6,7 +6,7 @@
                  [org.clojure/clojurescript "0.0-2411"]
                  [org.clojure/tools.cli "0.3.2-SNAPSHOT"]
                  [org.clojure/clojure-contrib "1.2.0"]
-                 [org.clojure/math.numeric-tower "0.0.5-SNAPSHOT"]
+                 [org.clojure/math.numeric-tower "0.0.4"]
                  ; Server
                  [compojure "1.3.1"]
                  [com.novemberain/langohr "2.11.0"]
@@ -15,7 +15,7 @@
                  [ring/ring-json "0.3.1"]
                  [ring/ring-defaults "0.1.2"]
                  [http-kit "2.1.19"]
-                 [cheshire "5.3.1"]
+                 [cheshire "5.4.0"]
                  [me.shenfeng/mustache "1.1"]
                  [com.taoensso/timbre "3.3.1"]
                  [clj-time "0.8.0"]
