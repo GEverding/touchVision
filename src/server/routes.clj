@@ -10,8 +10,7 @@
             [taoensso.timbre :as timbre]
             [cheshire.core :refer :all]
             [server.middleware :refer [wrap-middleware wrap-resources]]
-            [server.capture.middleware :refer [wrap-capture-channel]]
-            ))
+            [server.capture.middleware :refer [wrap-capture-channel]]))
 
 (timbre/refer-timbre)
 

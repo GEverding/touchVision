@@ -11,6 +11,8 @@
             [taoensso.timbre :as timbre]
             [cheshire.core :refer [decode encode]]))
 
+(defn uuid [] (str (java.util.UUID/randomUUID)))
+
 (timbre/refer-timbre)
 
 (defn ^:private random-date [start end]
@@ -23,7 +25,7 @@
 
 (defn ^:private wrap-data [data]
   {:type :post
-   :data data})
+   :data (merge  data {:id (uuid)})})
 
 (defn ^:private gen-fake-data [i]
    {:x (rand 100)
@@ -55,13 +57,13 @@
         [i 0]
         (if (= (:mode @state) :live)
           (let [datom (<! stdin)]
-            (do
-              (>! stdout (wrap-data datom))))
+              (when (>! stdout (wrap-data datom))
+                (recur (inc i)) ))
           (let [datom (gen-fake-data i)]
-            (do
-              (>! stdout (wrap-data datom))
-              (Thread/sleep (+ 1000 (rand-int 2000))))))
-        (recur (inc i)))
+            (when (>! stdout (wrap-data datom))
+              (do
+                (Thread/sleep (+ 1000 (rand-int 2000)))
+                (recur (inc i)))))))
       (-> this
           (assoc :state state)
           (assoc :mode mode)

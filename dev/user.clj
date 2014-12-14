@@ -12,7 +12,6 @@
             [com.stuartsierra.component :as component]
             [schema.coerce :as coerce]
             [langohr.core :as rabbit]
-            [schema.core :as s]
             [server.core :as jarvis]
             [server.system :as system]))
 

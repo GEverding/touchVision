@@ -62,9 +62,12 @@ svg {
   shape-rendering: crispEdges;
 }
 
-.debug-view {
-  height: 600px;
+.visualizer-view {
+  height: 450px;
   overflow: scroll;
+  &::-webkit-scrollbar { 
+    display: none; 
+  }
 }
 
 .pgm-container svg {

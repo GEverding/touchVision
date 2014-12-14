@@ -7,8 +7,9 @@
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
             [sablono.core :as html :refer-macros [html]]
-            [client.views.pgm :refer [pgm-view]]
-            [client.views.debug :refer [debug-view]]
+            [cljs-log.core :as log]
+            [client.views.pgm :refer (->pgm-view)]
+            [client.views.visualizer :refer (->visualizer-view)]
             [client.views.navbar :refer [navbar-controls]]
             [client.views.options :refer [options-view]]
             [client.views.downloader :refer [downloader-view]]
@@ -19,8 +20,7 @@
 
 (def app-state (atom nil))
 
-
-(defn index []
+(defn index [ws-chan select-chan]
   (om/root
     (fn [app owner]
       (om/component
@@ -32,25 +32,34 @@
                 [:div {:class "row"}
                  [:div {:class "col-md-12"}
                  [:div {:class "col-md-2"}
-                  (om/build options-view  app )
-                  (om/build downloader-view  app ) ]
+                  ;; (om/build options-view  app )
+                  ;; (om/build downloader-view  app )
+                  ]
                  [:div {:class "col-md-10"}
-                  (om/build debug-view app)]]]
+                  (->visualizer-view app)
+                  ]]]
                 [:div {:class "row"}
-                 (om/build pgm-view app)
+                 (->pgm-view app)
                  ]]])))
-
     app-state
-    {:target (sel1 ".js-app")})
-  )
+    {:target (sel1 ".js-app")
+     :shared {:ws-chan ws-chan
+              :select-chan select-chan }}))
+
+(def l (log/get-logger "core"))
 
 (defn main []
   (let [stream (ws/start!)
+        select-chan (chan)
         ch (chan (sliding-buffer 25))]
+    (log/start-display (log/console-output))
     (go
       (let [subscriber (sub stream :post ch)]
         (loop [m (<! ch)]
-          (println (:data m))
-          (recur (<! ch)))))))
+          (when m
+            (do
+              (log/finest l (:data m))
+              (recur (<! ch)))))))
+    (index stream select-chan)))
 
 (main)
