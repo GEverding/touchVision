@@ -9,7 +9,7 @@
 ; Provides useful Timbre aliases in this ns
 (timbre/refer-timbre)
 
-(defrecord App [port threads capture]
+(defrecord App [port threads capture db]
   component/Lifecycle
   (start [this]
     (let [server (get this :app (atom nil)) ]
@@ -17,7 +17,7 @@
         (when-not (nil? @server) (@server))
         ;; start web with app routes
         (reset! server
-                (run-server (wrap-app {:capture capture})
+                (run-server (wrap-app {:capture capture :db db})
                             {:port port
                              :thread threads}))
         (assoc this :app server)))
