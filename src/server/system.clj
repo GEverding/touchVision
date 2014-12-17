@@ -16,7 +16,7 @@
               [:capture :db])
     :app (component/using
            (app/start-app port threads)
-           [:capture :db])))
+           [:capture :writer :db])))
 
 (defn -main [& args]
   (let [[port threads mode] args]

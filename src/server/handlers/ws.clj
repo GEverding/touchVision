@@ -8,11 +8,11 @@
 (defonce state (atom { :stream :closed }))
 
 (defn capture-ws [req]
-  (let [ capture (-> req :resources :capture)]
+  (let [ writer (-> req :resources :writer)]
     (with-channel req ws-ch
       {:read-ch (chan (dropping-buffer 10))
        :format :edn} ; again, :edn is default
-      (let [stdout (:stdout capture)]
+      (let [stdout (:stdout writer)]
         (go
           (loop [datom (<! stdout)]
                   (when datom
