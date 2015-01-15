@@ -3,8 +3,8 @@
   :url "https://github.com/GEverding/touchVision"
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
-                 [org.clojure/clojurescript "0.0-2665"]
-                 [org.clojure/tools.cli "0.3.2-SNAPSHOT"]
+                 [org.clojure/clojurescript "0.0-2511"]
+                 [org.clojure/tools.cli "0.3.1"]
                  [org.clojure/clojure-contrib "1.2.0"]
                  [org.clojure/math.numeric-tower "0.0.4"]
                  ; Server
@@ -44,7 +44,7 @@
                  [jarohen/chord "0.5.0" :exclusions [org.clojure/clojure]]
                  [org.om/om "0.8.0"]
                  [GEverding/cljs-log "0.1.0-SNAPSHOT"]]
-  :plugins [[lein-cljsbuild "1.0.3"]
+  :plugins [[lein-cljsbuild "1.0.4"]
             [lein-cooper "0.0.1"] ]
   :source-paths ["src"]
   :test-paths ["test"]
