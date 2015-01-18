@@ -4,8 +4,7 @@
             [cljs-log.core :as log]
             [cljs.core.async :as async :refer [<! >! chan pub close! put! sliding-buffer]]
             [om.core :as om :include-macros true]
-            [om.dom :as dom :include-macros true]
-            [client.request :refer [request]]))
+            [om.dom :as dom :include-macros true]))
 
 (def ^:private l (log/get-logger "ws"))
 

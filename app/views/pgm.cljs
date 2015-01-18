@@ -125,6 +125,5 @@
              (om/build graph app {:opts {:width width
                                          :height height
                                          :margin margin }})
-
              ]))))
 

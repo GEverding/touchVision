@@ -1,4 +1,4 @@
-3000(ns client.views.navbar
+(ns client.views.navbar
   (:require [dommy.utils :as utils]
             [dommy.core :as dommy :refer-macros [sel sel1]]
             [om.core :as om :include-macros true]

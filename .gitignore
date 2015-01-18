@@ -52,3 +52,4 @@ resources/public/css/*.css
 
 tags
 .sass-cache
+*.log

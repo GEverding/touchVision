@@ -9,6 +9,7 @@
             [clojure.string :as str]
             [clojure.test :as test]
             [clojure.tools.namespace.repl :refer (refresh refresh-all)]
+            [clojure.core.async :as async]
             [com.stuartsierra.component :as component]
             [environ.core :refer (env)]
             [schema.coerce :as coerce]

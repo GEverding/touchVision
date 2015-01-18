@@ -5,6 +5,7 @@
             [server.capture.core :as capture]
             [server.db :as db]
             [server.io.writer :as writer]
+            [server.io.reader :as reader]
             [server.core :as app]))
 
 (defnk system [{port 3000} {threads 2} {mode :fake} db-spec]

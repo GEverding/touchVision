@@ -1,38 +1,58 @@
 (ns client.request
-  (:require [ajax.core :refer [GET POST PUT DELETE ajax-request]]))
+  ;; (:use plumbing.core)
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [ajax.core :refer [GET POST PUT DELETE]]
+            [plumbing.core :refer-macros [?>]]
+            [cljs.core.async :as async :refer [put! chan]]))
 
 (def default-params {:finally identity
                      :format :json
+                     :response-format :json
                      :keywords? true })
 
-(defn make-request
-  [{:keys [success fail data] :as opts :or { success identity fail identity params "" }}]
+(defn build-request
+  "Build Ajax by extending default-params"
+  [ch data]
   (-> default-params
-      (assoc :handler success)
-      (assoc :error-handler fail)
-      (assoc :params data)))
+      (assoc :handler (fn [xhr] (put! ch xhr)))
+      (assoc :error-handler (fn [xhr] (put! ch (:response xhr))))
+      (?> #(not (empty? %)) (assoc :params data))))
 
-(defmulti request (fn [req _ _] ( :type req ) ))
+(defmulti r (fn [opts _] (:type opts)))
 
-(defmethod request :get
-  [req _ opts]
-  (let [{:keys [success fail]} opts
-        params (make-request { :success success :fail fail} ) ]
-    (.log js/console params)
-    (GET (:url req) (make-request { :success success :fail fail} ))))
+(defmethod r :get
+  ([opts] (r opts (chan)))
+  ([opts ch]
+   (assert (contains? opts :url) "You need to supply a :url")
+   (let [params (build-request ch {}) ]
+     (println params)
+     (GET (:url opts) params)
+     ch)))
 
-(defmethod request :post
-  [req data opts]
-  (let [{:keys [success fail]} opts ]
-    (POST (:url req) (make-request {:success success :fail fail :data data} ))))
+(defmethod r :post
+  ([opts] (r opts (chan)))
+  ([opts ch]
+   (assert (not (empty? (:data opts))))
+   (assert (contains? opts :url))
+   (POST (:url opts)
+         (build-request ch (:data opts)))
+   ch))
 
-(defmethod request :put
-  [req data opts]
-  (let [{:keys [success fail]} opts ]
-    (PUT (:url req) (make-request { :success success :fail fail :data data} ))))
+(defmethod r :put
+  ([opts] (r opts (chan)))
+  ([opts ch]
+   (assert (not (empty? (:data opts))))
+   (assert (contains? opts :url))
+   (PUT (:url opts)
+        (build-request ch (:data opts)))
+   ch))
 
-(defmethod request :delete
-  [req data opts]
-  (let [{:keys [success fail]} opts ]
-    (DELETE (:url req) (make-request { :success success :fail fail :data data}))))
+(defmethod r :delete
+  ([opts] (r opts (chan)))
+  ([opts ch]
+   (assert (not (empty? (:data opts))))
+   (assert (contains? opts :url))
+   (DELETE (:url opts)
+           (build-request ch (:data opts)))
+   ch))
 

@@ -6,12 +6,12 @@
 
 (timbre/refer-timbre)
 
-(def ^:private current_rocording (atom nil))
+(defonce ^:private current_recording (atom nil))
 
 (defn set-recording-id! [id]
   (if id
     (do
-      (reset! current_rocording id)
+      (reset! current_recording id)
       true)
     false))
 
@@ -25,8 +25,8 @@
         [datom (<! stdin)]
         (when datom
           (let [{:keys [pressure timestamp x y z]} (:data datom) ]
-            (when @current_rocording
-              (let [row (q/append<! conn @current_rocording pressure x y z timestamp)]
+            (when @current_recording
+              (let [row (q/append<! conn @current_recording pressure x y z timestamp)]
                 (debug "saved: " row)
                 (when row
                   (put! stdout {:type :post :data row}))))

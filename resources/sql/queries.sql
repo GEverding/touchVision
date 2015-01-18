@@ -23,3 +23,18 @@ insert into captured_data (recording_id, pressure, x, y, z, timestamp) values(:r
 select id, pressure, x, y, z
 from captured_data
 where recording_id = :recording_id
+
+-- name: find-all-recordings
+-- Find all recording for a patient
+select r.id as recording_id, p.name, r.created_on, r.start_time, r.stop_time
+from recording as r, patient as p
+where r.patient_id = p.id
+
+-- name: find-active-recording
+-- Find an active recording
+select r.id, p.name, r.created_on, r.start_time
+from recording as r, patient as p
+where r.patient_id = p.id and 
+      r.start_time is not null and 
+      r.stop_time is null
+limit 1
