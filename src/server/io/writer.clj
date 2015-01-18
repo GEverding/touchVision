@@ -15,7 +15,7 @@
       true)
     false))
 
-(defrecord Writer [capture db]
+(defrecord Writer [capture db rabbit]
   Lifecycle
   (start [this]
     (let [conn (:conn db)

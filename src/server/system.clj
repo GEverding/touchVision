@@ -4,20 +4,22 @@
             [plumbing.core :refer [defnk]]
             [server.capture.core :as capture]
             [server.db :as db]
+            [server.rabbit :as rabbit]
             [server.io.writer :as writer]
             [server.io.reader :as reader]
             [server.core :as app]))
 
 (defnk system [{port 3000} {threads 2} {mode :fake} db-spec]
   (component/system-map
-    :capture (capture/capture-start mode)
     :db (db/new-database db-spec)
+    :rabbit (rabbit/new-rabbit)
+    :capture (capture/capture-start mode)
     :writer (component/using
               (writer/start-writer)
-              [:capture :db])
+              [:capture :db :rabbit])
     :app (component/using
            (app/start-app port threads)
-           [:capture :writer :db])))
+           [:capture :writer :db :rabbit])))
 
 (defn -main [& args]
   (let [[port threads mode] args]
