@@ -50,18 +50,16 @@
   (render [_]
     (let [current-mode (:mode app)
           is-active? (fn [mode] (= mode (:mode app))) ]
-      (html [:div {:class "col-sm-2 switch-container"
-                   :style {:display "inline-block"
-                           :width "17%" }}
+      (html [:div {:class "col-sm-6 switch-container" }
              [:button {:type "button"
-                       :class (str "btn btn-info col-md-6 "
+                       :class (str "btn btn-info col-sm-6 "
                                    (if (is-active? :live)
                                      "active"
                                      ""))
                        :on-click #(switch! app owner :live )
                        } "Live"]
              [:button {:type "button"
-                       :class (str "btn btn-info col-md-6 "
+                       :class (str "btn btn-info col-sm-6 "
                                    (if (is-active? :fake)
                                      "active"
                                      ""))
@@ -72,7 +70,7 @@
 (defcomponent toggle-view [app owner]
   (render
     [_]
-    (html [:div {:class "col-md-4 col-sm-2 toggle-container"}
+    (html [:div {:class "col-sm-3 toggle-container"}
            [:button {:type "button"
                      :class (str "btn btn-warning btn-block "
                                  (if (= :open (:stream app))
@@ -87,7 +85,7 @@
 (defcomponent zero-view [app owner]
   (render
     [_]
-    (html [:div {:class "col-md-4 col-sm-2 zero-container"}
+    (html [:div {:class "col-sm-3 zero-container"}
            [:button {:type "button"
                      :class (str "btn btn-danger btn-block ") :on-click (fn [_] (zero-position! app owner)) } "Zero" ]])))
 
@@ -97,9 +95,9 @@
   (render
     [_]
     (let []
-      (html [:div {:class "row option-container"}
-             [:h3.col-lg-12 "Capture Controls"]
-             [:div {:class "option-group"}
+      (html [:div.option-container.col-sm-6.col-md-2
+             [:h3 "Capture Controls"]
+             [:div.option-group
               (->switch-view app)
               (->toggle-view app)
               (->zero-view app) ]
