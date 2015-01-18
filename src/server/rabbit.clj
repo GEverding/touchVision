@@ -30,9 +30,10 @@
       (lq/bind ch qname "touchvision" {:routing-key "glove"})
       (lc/subscribe ch qname (partial message-cb capture-in) {:auto-ack true})
       (go-loop [[m ch] (alts! [capture-in stdin])]
-               (cond
-                 (= ch capture-in) (put! out m)
-                 (= ch stdin) (log/fatal m))
+               (when m
+                 (cond
+                   (= ch capture-in) (put! out m)
+                   (= ch stdin) (log/fatal m)))
                (recur (alts! [capture-in stdin])))
       (-> this
           (assoc :out out)
