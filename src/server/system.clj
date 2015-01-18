@@ -13,7 +13,9 @@
   (component/system-map
     :db (db/new-database db-spec)
     :rabbit (rabbit/new-rabbit)
-    :capture (capture/capture-start mode)
+    :capture (component/using
+               (capture/capture-start mode)
+               [:rabbit])
     :writer (component/using
               (writer/start-writer)
               [:capture :db :rabbit])
