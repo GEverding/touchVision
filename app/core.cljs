@@ -70,7 +70,7 @@
           (let [new-app-state (plumbing/for-map
                                 [[k v] (:data res)]
                                 k
-                                (if (keyword? v)
+                                (if (string? v)
                                   (keyword v)
                                   v))]
             (log/fine l new-app-state)
