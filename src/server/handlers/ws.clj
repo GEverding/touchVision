@@ -6,7 +6,6 @@
             [server.db.queries :as q]))
 
 (timbre/refer-timbre)
-(defonce state (atom { :stream :closed }))
 
 (defn capture-ws [req]
   (let [capture (-> req :resources :capture)
@@ -25,10 +24,8 @@
 (defn configure-ws [req]
   (let [{:keys [mode stream]} (:body req)
         caputre (-> req :resources :capture) ]
-    (dosync
       (swap! (:state caputre) assoc :mode (keyword mode))
-      (swap! state assoc :stream (keyword stream)))
-    (res {:msg "Statue Updated"})))
+    (res {:msg "State Updated"})))
 
 (defn init [req]
   (let [capture (-> req :resources :capture)
@@ -37,6 +34,5 @@
        current-recording (q/find-active-recording conn) ]
     (res {:msg "init"
           :data {:mode (:mode @capture-state)
-                 :stream (:stream @state)
                  :patient-id 1
                  :current-recording current-recording}})))
