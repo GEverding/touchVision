@@ -48,11 +48,11 @@
           ch (lch/open conn)
           stdin (chan (sliding-buffer 10))
           stdout (chan (sliding-buffer 10))
-          qname (lq/declare-server-named ch :exclusive true :auto-delete true) ]
+          qname (lq/declare-server-named ch { :exclusive true :auto-delete true})]
       (swap! state assoc :mode mode )
       (le/direct ch "touchvision")
-      (lq/bind ch qname "touchvision" :routing-key "glove")
-      (lc/subscribe ch qname (partial message-cb stdin) :auto-ack true)
+      (lq/bind ch qname "touchvision" {:routing-key "glove"})
+      (lc/subscribe ch qname (partial message-cb stdin) {:auto-ack true})
       (go-loop
         [i 0]
         (if (= (:mode @state) :live)

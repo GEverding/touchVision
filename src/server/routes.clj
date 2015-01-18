@@ -2,7 +2,8 @@
   (:use plumbing.core
         server.handlers.index
         server.handlers.api
-        server.handlers.ws)
+        server.handlers.ws
+        server.handlers.recordings)
   (:require [compojure.core :refer :all]
             [compojure.handler :as handler]
             [compojure.route :as route]
@@ -17,7 +18,11 @@
 (defroutes app
   (GET "/" [] index)
   (GET "/ws" [] capture-ws)
-  (GET "/ws/config" [] configure-ws)
+  (PUT "/ws/config" [] configure-ws)
+  (GET "/init" [] init)
+  (POST "/recordings" [] new-recording)
+  (ANY "/recordings/:id/start" [id :as r] (start id r))
+  (ANY "/recordings/:id/stop" [id :as r] (stop id r))
   (route/not-found "Go Away Troll"))
 
 (defn wrap-app [resources]

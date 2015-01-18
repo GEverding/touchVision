@@ -5,6 +5,7 @@
             [server.capture.core :as capture]
             [server.db :as db]
             [server.io.writer :as writer]
+            [server.io.reader :as reader]
             [server.core :as app]))
 
 (defnk system [{port 3000} {threads 2} {mode :fake} db-spec]
@@ -16,7 +17,7 @@
               [:capture :db])
     :app (component/using
            (app/start-app port threads)
-           [:capture :db])))
+           [:capture :writer :db])))
 
 (defn -main [& args]
   (let [[port threads mode] args]

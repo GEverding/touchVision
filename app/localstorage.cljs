@@ -1,2 +1,2 @@
-(ns jarvis.client.localstorage
+(ns client.localstorage
   )

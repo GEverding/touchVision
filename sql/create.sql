@@ -1,7 +1,7 @@
 -- ======================================================================
 -- ===   Sql Script for Database : touchVision
 -- ===
--- === Build : 12
+-- === Build : 14
 -- ======================================================================
 
 BEGIN WORK;
@@ -27,6 +27,8 @@ CREATE TABLE recording
     id          serial,
     created_on  timestamp   not null default current_timestamp,
     patient_id  int         not null,
+    start_time  timestamp,
+    stop_time   timestamp,
 
     primary key(id),
 
