@@ -1,13 +1,7 @@
 (ns server.capture.core
   (:require [com.stuartsierra.component :as component]
-            [langohr.core      :as rmq]
-            [langohr.channel   :as lch]
-            [langohr.queue     :as lq]
-            [langohr.exchange  :as le]
-            [langohr.consumers :as lc]
-            [langohr.basic     :as lb]
             [clojure.math.numeric-tower :as math :refer [floor round]]
-            [clojure.core.async :refer [<! >! put! close! chan sliding-buffer go-loop]]
+            [clojure.core.async :refer [<! >! put! close! chan sliding-buffer go-loop pub sub]]
             [taoensso.timbre :as timbre]
             [cheshire.core :refer [decode encode]]))
 
@@ -34,56 +28,43 @@
     :pressure (floor (rand 6))
     :timestamp (+ i (rand))})
 
-(defn ^:private message-cb [stdin ch {:keys [content-type delivery-tag type] :as meta}  ^bytes payload]
-  (let [blob (decode (String. payload "UTF-8") true) ]
-    (println blob)
-    (put! stdin blob )))
-
-
-(defrecord Capture [mode]
+(defrecord Capture [mode rabbit]
   component/Lifecycle
   (start [this]
     (let [state (atom {})
-          conn (rmq/connect)
-          ch (lch/open conn)
           stdin (chan (sliding-buffer 10))
-          stdout (chan (sliding-buffer 10))
-          qname (lq/declare-server-named ch { :exclusive true :auto-delete true})]
+          out (chan (sliding-buffer 10))
+          stdout (pub out :type)]
+      (sub (:stdout rabbit) :glove stdin)
       (swap! state assoc :mode mode )
-      (le/direct ch "touchvision")
-      (lq/bind ch qname "touchvision" {:routing-key "glove"})
-      (lc/subscribe ch qname (partial message-cb stdin) {:auto-ack true})
       (go-loop
         [i 0]
         (if (= (:mode @state) :live)
           (let [datom (<! stdin)]
-              (when (>! stdout (wrap-data datom))
-                (recur (inc i)) ))
+            ;; extract from aysnc pub wrapper
+            (when (>! out (wrap-data (:data datom)))
+              (recur (inc i)) ))
           (let [datom (gen-fake-data i)]
-            (when (>! stdout (wrap-data datom))
+            (when (>! out (wrap-data datom))
               (do
-                (Thread/sleep (+ 1000 (rand-int 2000)))
+                (Thread/sleep (+ 3000 (rand-int 2000)))
                 (recur (inc i)))))))
       (-> this
           (assoc :state state)
           (assoc :mode mode)
           (assoc :stdout stdout)
           (assoc :stdin stdin)
-          (assoc :rmq-conn conn)
-          (assoc :rmq-ch ch) )))
+          (assoc :out out)
+          )))
   (stop [this]
-    (rmq/close (:rmq-conn this))
     (close! (:stdin this))
-    (close! (:stdout this))
+    (close! (:out this))
     (swap! (:state this) {})
     (-> this
         (assoc :mode nil)
         ;; (assoc :stdin nil)
         ;; (assoc :stdout nil)
-        (assoc :rmq-conn nil)
-        (assoc :state (atom {}))
-        (assoc :rmq-ch nil))))
+        (assoc :state (atom {})))))
 
 (defn capture-start [mode]
   (map->Capture {:mode mode}))
-

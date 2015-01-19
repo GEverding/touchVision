@@ -56,20 +56,20 @@
   (render-state
     [_ state]
     (let [recording-id (:recording-id state)]
-      (html [:div {:class "row rec-container"}
-             [:h3.col-lg-12 "Recording Controls"]
-             [:div {:class "option-group"}
-              [:div.col-sm-1
+      (html [:div {:class "rec-container col-md-2 col-sm-6"}
+             [:h3 "Recording Controls"]
+             [:div.option-group
+              [:div.col-sm-4
                [:button {:type "button"
                          :class (str "btn btn-primary")
                          :on-click (fn [_] (new-recording app owner))
                          } "New"]]
-              [:div.col-sm-1
+              [:div.col-sm-4
                [:button {:type "button"
                          :class "btn btn-success"
                          :on-click (fn [_] (start-recording app owner))
                          } "Start"]]
-               [:div.col-sm-1
+               [:div.col-sm-4
                [:button {:type "button"
                          :class "btn btn-danger"
                          :on-click (fn [_] (stop-recording app owner))

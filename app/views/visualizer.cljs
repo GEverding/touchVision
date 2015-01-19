@@ -47,17 +47,21 @@
      :time-bound {:low (.-MIN_VALUE js/Number) :high (.-MAX_VALUE js/Number)}})
   (will-mount
     [_]
-    (let [{:keys [ws-chan select-chan]} (om/get-shared owner)
-          ws-sub (chan (sliding-buffer 25))]
-      (sub ws-chan :post ws-sub)
+    (let [{:keys [ws-chan select-chan event-bus]} (om/get-shared owner)
+          e-chan (chan)
+          ws-sub-chan (chan (sliding-buffer 25))]
+      (async/tap (:bus event-bus) e-chan)
+      (sub ws-chan :post ws-sub-chan)
       (go-loop
-        [[m c] (alts! [ws-sub select-chan])]
+        [[m c] (alts! [ws-sub-chan select-chan e-chan])]
         (when m
           (condp = c
-            ws-sub (om/update-state! owner :datoms #(conj % m))
+            ws-sub-chan (om/update-state! owner :datoms #(conj % m))
+            e-chan (if (= m :reset)
+                     (om/set-state! owner :datoms []))
             select-chan (do
                           (om/set-state! owner :time-bound m)))
-          (recur (alts! [ws-sub select-chan]))))))
+          (recur (alts! [ws-sub-chan select-chan e-chan]))))))
   (render-state
     [_ {:keys [time-bound datoms]}]
     (html [:div {:class "row visualizer-view js-visualizer-view"}
