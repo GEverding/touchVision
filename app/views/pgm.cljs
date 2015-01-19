@@ -60,15 +60,19 @@
          }))
   (will-mount
     [_]
-    (let [ws (:ws-chan (om/get-shared owner))
-          ch (chan (sliding-buffer 25))]
-      (sub ws :post ch)
+    (let [{:keys [ws-chan event-bus]} (om/get-shared owner)
+          e-chan (chan)
+          ws-sub-chan (chan (sliding-buffer 25))]
+      (sub ws-chan :post ws-sub-chan)
+      (async/tap (:bus event-bus) e-chan)
       (go-loop
-        [m (<! ch)]
+        [[m c] (async/alts! [ws-sub-chan e-chan])]
         (when m
-          (do
-            (om/update-state! owner :all-datoms #(conj % (:data m)))
-            (recur (<! ch)))) )))
+          (condp = c
+            ws-sub-chan (om/update-state! owner :all-datoms #(conj % (:data m)))
+            e-chan (if (= m :reset)
+                     (om/set-state! owner :all-datoms [])))
+            (recur (async/alts! [ws-sub-chan e-chan]))))))
     (did-mount
       [this]
       (let [brushg (om/get-node owner "brush")

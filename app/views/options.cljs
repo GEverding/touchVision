@@ -21,21 +21,12 @@
     (when-not (= (om/get-state owner :mode) new-state)
       (om/update! app :mode new-state)
       (sync-app @app)
-      (put! event-bus :reset) )))
+      (put! event-bus :reset))))
 
-(defn switch-stream-state! [app owner]
+(defn clear-screen [app owner]
   (let [event-bus (om/get-shared owner [:event-bus :chan])]
-    (if (= (:stream @app) :open)
-      (do
-        (log/info l "Stream switched to closed state")
-        (om/update! app :stream :closed)
-        (sync-app @app)
-        (put! event-bus :paused))
-      (do
-        (log/info l "Stream switched to open state")
-        (om/update! app :stream :open)
-        (sync-app @app)
-        (put! event-bus :running)))))
+        (log/warning l "clearing screen")
+        (put! event-bus :reset)))
 
 (defn zero-position! [app owner]
   (let [event-bus (om/get-shared owner [:event-bus :chan])]
@@ -67,20 +58,14 @@
                        } "Fake"]]
             ))))
 
-(defcomponent toggle-view [app owner]
+(defcomponent clear-view [app owner]
   (render
     [_]
-    (html [:div {:class "col-sm-3 toggle-container"}
+    (html [:div {:class "col-sm-3 clear-container"}
            [:button {:type "button"
-                     :class (str "btn btn-warning btn-block "
-                                 (if (= :open (:stream app))
-                                   "active"
-                                   ""))
-                     :on-click (fn [_] (switch-stream-state! app owner))
-                     } (if (= :open (:stream app))
-                         "On"
-                         "Off"
-                         ) ]])))
+                     :class "btn btn-warning "
+                     :on-click (fn [_] (clear-screen app owner))
+                     } "Clear"]])))
 
 (defcomponent zero-view [app owner]
   (render
@@ -99,7 +84,7 @@
              [:h3 "Capture Controls"]
              [:div.option-group
               (->switch-view app)
-              (->toggle-view app)
+              (->clear-view app)
               (->zero-view app) ]
              ]))))
 
