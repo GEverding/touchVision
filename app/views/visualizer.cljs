@@ -11,8 +11,7 @@
             [om.core :as om :include-macros true]
             [sablono.core :as html :refer-macros [html]]
             [client.views.viz.plot :as plot]
-            [client.views.viz.table :as table]
-            ))
+            [client.views.viz.table :as table]))
 
 (def ^:private l (log/get-logger "viz"))
 

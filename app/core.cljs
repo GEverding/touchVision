@@ -39,7 +39,8 @@
                   (->recording-controls-view app)
                   ]
                  [:div {:class "col-md-10 col-sm-12"}
-                  (->visualizer-view app)]]
+                  (->visualizer-view app)
+                  ]]
                 [:div {:class "row"}
                  (->pgm-view app)
                  ]]])))

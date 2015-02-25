@@ -32,11 +32,11 @@
           res (handler request)
           status (:status res) ]
       (do
-        ;(when (json-request? request)
+        (when (json-request? request)
           (aprint request)
           (debug (str "["logger"]") method status uri (if (nil? params) "" params) )
           (aprint res)
-          ;)
+          )
         res))))
 
 (defn wrap-stacktrace
