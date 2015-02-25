@@ -49,12 +49,25 @@
   :source-paths ["src"]
   :test-paths ["test"]
   :repositories {"sonatype-oss-public" "https://oss.sonatype.org/content/groups/public/"}
-  :profiles { :dev {:source-paths ["dev" "src"]
-                    :plugins [[lein-midje "3.1.3"]]
-                    :repl-options {:init-ns user}
-                    :dependencies [[org.clojure/tools.namespace "0.2.8"]
-                                   [org.clojure/java.classpath "0.2.2"]
-                                   [midje "1.7.0-SNAPSHOT"] ]}
+  :profiles {:dev {:source-paths ["dev" "src"]
+                   :dependencies [[cider/cider-nrepl "0.9.0-SNAPSHOT"]
+                                  [org.clojure/tools.nrepl "0.2.7"]]
+                   :repl-options {:init-ns user
+                                  :nrepl-middleware
+                                  [cider.nrepl.middleware.apropos/wrap-apropos
+                                   cider.nrepl.middleware.classpath/wrap-classpath
+                                   cider.nrepl.middleware.complete/wrap-complete
+                                   cider.nrepl.middleware.format/wrap-format
+                                   cider.nrepl.middleware.info/wrap-info
+                                   cider.nrepl.middleware.inspect/wrap-inspect
+                                   cider.nrepl.middleware.macroexpand/wrap-macroexpand
+                                   cider.nrepl.middleware.ns/wrap-ns
+                                   cider.nrepl.middleware.pprint/wrap-pprint
+                                   cider.nrepl.middleware.resource/wrap-resource
+                                   cider.nrepl.middleware.stacktrace/wrap-stacktrace
+                                   cider.nrepl.middleware.test/wrap-test
+                                   cider.nrepl.middleware.trace/wrap-trace
+                                   cider.nrepl.middleware.undef/wrap-undef]}}
              :prod {:aot :all
                     :hooks [leiningen.cljsbuild]
                     :main server.system}}
