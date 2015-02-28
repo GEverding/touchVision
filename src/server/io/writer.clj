@@ -28,7 +28,7 @@
           (let [{:keys [pressure timestamp x y z]} (:data datom) ]
             (when @current_recording
               (let [row (q/append<! conn @current_recording pressure x y z timestamp)]
-                (debug "saved: " row)
+                ;(debug "saved: " row)
                 ;; (when row
                 ;;   (put! stdout {:type :post :data row}))
                 ))

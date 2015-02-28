@@ -10,6 +10,11 @@
 
 (defonce ^:private l (log/get-logger "rec"))
 
+(defn clear-screen [owner]
+  (let [event-bus (om/get-shared owner [:event-bus :chan])]
+        (log/warning l "clearing screen")
+        (put! event-bus :reset)))
+
 (defn- new-recording [app owner]
   (if (=  (om/get-state owner :state) :stopped)
     (let [cb (r {:type :post
@@ -17,9 +22,10 @@
                  :data {:patient-id (:patient-id @app)} })]
       (go
         (let [res (<! cb)]
-          (if-not (contains? res :error)
+          (if (= (:status res) 200)
             (do
-              (om/set-state! owner :recording-id (-> res :data :id))
+              (clear-screen owner)
+              (om/set-state! owner :recording-id (-> res :body :data :id))
               (om/set-state! owner :state :ready)))))
       )))
 
@@ -31,7 +37,7 @@
                  :url (str "/recordings/" id "/start") })]
       (go
         (let [res (<! cb)]
-          (if-not (contains? res :error)
+          (if (= (:status res) 200)
             (om/set-state! owner :state :started))))
       )))
 
@@ -42,7 +48,7 @@
                  :url (str "/recordings/" id "/stop") })]
       (go
         (let [res (<! cb)]
-          (if-not (contains? res :error)
+          (if (= (:status res) 200)
             (om/set-state! owner :state :stopped))))
       )))
 

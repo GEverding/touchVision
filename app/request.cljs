@@ -14,8 +14,10 @@
   "Build Ajax by extending default-params"
   [ch data]
   (-> default-params
-      (assoc :handler (fn [xhr] (put! ch xhr)))
-      (assoc :error-handler (fn [xhr] (put! ch (:response xhr))))
+      (assoc :handler (fn [res] (put! ch {:status 200
+                                         :body res})))
+      (assoc :error-handler (fn [res] (put! ch {:status (:status res)
+                                               :error (:response res)})))
       (?> #(not (empty? %)) (assoc :params data))))
 
 (defmulti r (fn [opts _] (:type opts)))
@@ -24,8 +26,7 @@
   ([opts] (r opts (chan)))
   ([opts ch]
    (assert (contains? opts :url) "You need to supply a :url")
-   (let [params (build-request ch {}) ]
-     (println params)
+   (let [params (build-request ch (:data opts)) ]
      (GET (:url opts) params)
      ch)))
 

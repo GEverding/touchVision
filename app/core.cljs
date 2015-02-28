@@ -51,30 +51,32 @@
               :event-bus event-bus}}))
 
 (defn main []
-  (let [stream (ws/start!)
+  (let [stream (ws/start! app-state)
         select-chan (chan)
         event-bus (chan 5)
         event-bus-mult (async/mult event-bus)
         ch (chan (sliding-buffer 25))
         init-chan (r {:type :get :url "/init"})]
-    (sub stream :post ch)
-    (go
-      (loop [m (<! ch)]
-        (when m
-          (do
-            (log/finest l (:data m))
-            (recur (<! ch))))))
     (go
       (let [res (<! init-chan)]
-        (if-not (contains? res :error)
+        (if (= (:status res) 200)
           (let [new-app-state (plumbing/for-map
-                                [[k v] (:data res)]
-                                k
-                                (if (string? v)
-                                  (keyword v)
-                                  v))]
+                               [[k v] (-> res :body :data)]
+                               k
+                               (if (string? v)
+                                 (keyword v)
+                                 v))]
             (log/fine l new-app-state)
             (reset! app-state new-app-state)
-            (index stream select-chan {:bus event-bus-mult :chan event-bus})))))))
+            (index stream select-chan {:bus event-bus-mult :chan event-bus})))))
+    (sub stream :post ch)
+    ;; (go
+    ;;   (loop [m (<! ch)]
+    ;;     (when m
+    ;;       (do
+    ;;         (log/finest l (:data m))
+    ;;         (recur (<! ch))
+    ;;         ))))
+    ))
 
 (main)
