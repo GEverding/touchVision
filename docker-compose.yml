@@ -1,9 +1,9 @@
-db:
-  image: touchvision/postgresql
-  volumes_from:
-    - postgres 
-  ports:
-    - "5432:5432"
+#db:
+#image: touchvision/postgresql
+#volumes_from:
+#- postgres 
+#ports:
+#- "5432:5432"
 rabbit:
   image: dockerfile/rabbitmq
   ports:
