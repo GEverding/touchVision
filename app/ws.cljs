@@ -2,7 +2,7 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [chord.client :refer [ws-ch]]
             [cljs-log.core :as log]
-            [cljs.core.async :as async :refer [<! >! chan pub close! put! sliding-buffer]]
+            [cljs.core.async :as async :refer [<! >! chan pub close! put! pub sliding-buffer]]
             [client.request :refer (r)]
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]))
@@ -27,7 +27,6 @@
                   (do
                     (doseq [d ds]
                       (do
-                        (println d)
                         (put! out {:type :post :data d})))
                     (reset! start (-> ds last :timestamp)))
                   )))))))))
@@ -38,7 +37,8 @@
         stdout (pub out :type)]
     (log/info l "starting Websocket listener")
     (js/setInterval fetch 2000 app-state out)
-    stdout))
+    {:pub stdout
+     :chan out}))
 
 (defn start! "start websocket" [app-state]
   (let [stdout (listen app-state)]

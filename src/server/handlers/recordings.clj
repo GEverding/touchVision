@@ -45,3 +45,12 @@
                                (read-string limit))]
     (res {:msg "New Data"
           :data (vec data)})))
+
+(defn get-recording-by-id [id req]
+  (let [c (get-in req [:resources :db :conn])
+        data (q/get-recording-data c (read-string id))]
+    (if (< 0 (count data))
+      (res {:msg id
+            :data (vec data)})
+      (res {:err "no data"
+            :data {:recording-id id}}))))

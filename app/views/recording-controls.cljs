@@ -23,11 +23,11 @@
       (go
         (let [res (<! cb)]
           (if (= (:status res) 200)
-            (do
+            (let [id (get-in res [:body :data :id])]
               (clear-screen owner)
-              (om/set-state! owner :recording-id (-> res :body :data :id))
-              (om/set-state! owner :state :ready)))))
-      )))
+              (om/set-state! owner :recording-id id)
+              (om/update! app [:recording-id] id)
+              (om/set-state! owner :state :ready))))))))
 
 (defn- start-recording [app owner]
   (log/info (om/get-state owner))

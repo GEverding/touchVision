@@ -9,11 +9,10 @@
 (defonce ^:private current_recording (atom nil))
 
 (defn set-recording-id! [id]
-  (if id
-    (do
-      (reset! current_recording id)
-      true)
-    false))
+  (do
+    (reset! current_recording id)
+    true)
+  false)
 
 (defrecord Writer [capture db rabbit]
   Lifecycle

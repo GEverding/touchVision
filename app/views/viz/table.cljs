@@ -54,7 +54,7 @@
           e-chan (chan)
           ws-sub-chan (chan (sliding-buffer 25))]
       (async/tap (:bus event-bus) e-chan)
-      (sub ws-chan :post ws-sub-chan)
+      (sub (:pub ws-chan) :post ws-sub-chan)
       (go-loop
         [[m c] (alts! [ws-sub-chan select-chan e-chan])]
         (when m

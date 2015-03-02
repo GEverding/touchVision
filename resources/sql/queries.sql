@@ -47,3 +47,8 @@ where recording_id=:id and
       timestamp > :start
 order by timestamp asc
 limit :limit
+
+-- name: get-recording-data
+select id,pressure,x,y,z,timestamp
+from captured_data
+where recording_id=:id
