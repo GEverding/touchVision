@@ -11,7 +11,7 @@
             [om.core :as om :include-macros true]
             [sablono.core :as html :refer-macros [html]]))
 
-(def ^:private l (log/get-logger "3d"))
+(def ^:private l (log/get-logger "table"))
 
 (defn print-data "" [data]
   (str "{ " (map (fn [[k v]] (str k " " v "\n")) data) " }"))
@@ -23,8 +23,6 @@
 (defn hide? [bounds d]
   (let [{:keys [low high]} bounds
         t (get-in d [:data :timestamp])]
-    (log/fine l bounds)
-    (log/fine l (< t high))
     (and (>= t low) (< t high))))
 
 (defn ^:private update-selected [data owner e]

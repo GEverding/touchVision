@@ -23,7 +23,6 @@
             (when (= (:status res) 200)
               (when (-> res :body :data)
                 (let [ds (-> res :body :data)]
-                  (println (:data (:body res)))
                   (do
                     (doseq [d ds]
                       (do
