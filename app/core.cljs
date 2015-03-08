@@ -12,6 +12,7 @@
             [client.views.visualizer :refer (->visualizer-view)]
             [client.views.navbar :refer [navbar-controls]]
             [client.views.options :refer (->options-view)]
+            [client.views.loader :refer (->loader-view)]
             [client.views.recording-controls :refer (->recording-controls-view)]
             ;; [client.views.downloader :refer [downloader-view]]
             [client.ws :as ws]
@@ -37,11 +38,13 @@
                  [:div {:class "col-md-2 col-sm-12"}
                   (->options-view app)
                   (->recording-controls-view app)
+                  (->loader-view app)
                   ]
                  [:div {:class "col-md-10 col-sm-12"}
-                  (->visualizer-view app)]]
+                 (->visualizer-view app)
+                  ]]
                 [:div {:class "row"}
-                 (->pgm-view app)
+                (->pgm-view app)
                  ]]])))
     app-state
     {:target (sel1 ".js-app")
@@ -50,30 +53,31 @@
               :event-bus event-bus}}))
 
 (defn main []
-  (let [stream (ws/start!)
+  (let [stream (ws/start! app-state)
         select-chan (chan)
         event-bus (chan 5)
         event-bus-mult (async/mult event-bus)
         ch (chan (sliding-buffer 25))
         init-chan (r {:type :get :url "/init"})]
-    (sub stream :post ch)
-    (go
-      (loop [m (<! ch)]
-        (when m
-          (do
-            (log/finest l (:data m))
-            (recur (<! ch))))))
     (go
       (let [res (<! init-chan)]
-        (if-not (contains? res :error)
+        (if (= (:status res) 200)
           (let [new-app-state (plumbing/for-map
-                                [[k v] (:data res)]
-                                k
-                                (if (string? v)
-                                  (keyword v)
-                                  v))]
+                               [[k v] (-> res :body :data)]
+                               k
+                               (if (string? v)
+                                 (keyword v)
+                                 v))]
             (log/fine l new-app-state)
             (reset! app-state new-app-state)
-            (index stream select-chan {:bus event-bus-mult :chan event-bus})))))))
+            (index stream select-chan {:bus event-bus-mult :chan event-bus})))))
+    ;; (go
+    ;;   (loop [m (<! ch)]
+    ;;     (when m
+    ;;       (do
+    ;;         (log/finest l (:data m))
+    ;;         (recur (<! ch))
+    ;;         ))))
+    ))
 
 (main)

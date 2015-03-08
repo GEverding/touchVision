@@ -7,21 +7,21 @@
 
 (timbre/refer-timbre)
 
-(defn capture-ws [req]
-  (let [capture (-> req :resources :capture)
-        capture-out (chan (sliding-buffer 10))]
-    (sub (:stdout capture) :post capture-out)
-    (with-channel req ws-ch
-      {:read-ch (chan (dropping-buffer 10))
-       :format :edn} ; again, :edn is default
-        (go
-          (loop [datom (<! capture-out)]
-            (when datom
-              (when (>! ws-ch datom)
-                (recur (<! capture-out)))
-              ))))))
+;; (defn capture-ws [req]
+;;   (let [capture (-> req :resources :capture)
+;;         capture-out (chan (sliding-buffer 10))]
+;;     (sub (:stdout capture) :post capture-out)
+;;     (with-channel req ws-ch
+;;       {:read-ch (chan (dropping-buffer 10))
+;;        :format :edn} ; again, :edn is default
+;;         (go
+;;           (loop [datom (<! capture-out)]
+;;             (when datom
+;;               (when (>! ws-ch datom)
+;;                 (recur (<! capture-out)))
+;;               ))))))
 
-(defn configure-ws [req]
+(defn configure-capture-device [req]
   (let [{:keys [mode stream]} (:body req)
         caputre (-> req :resources :capture) ]
       (swap! (:state caputre) assoc :mode (keyword mode))
@@ -35,4 +35,4 @@
     (res {:msg "init"
           :data {:mode (:mode @capture-state)
                  :patient-id 1
-                 :current-recording current-recording}})))
+                 :recording-id (-> current-recording first :id)}})))

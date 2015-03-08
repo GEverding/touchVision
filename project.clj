@@ -43,18 +43,32 @@
                  [com.andrewmcveigh/cljs-time "0.3.0"]
                  [jarohen/chord "0.5.0" :exclusions [org.clojure/clojure]]
                  [org.om/om "0.8.0"]
-                 [GEverding/cljs-log "0.1.0-SNAPSHOT"]]
+                 [GEverding/cljs-log "0.1.0-SNAPSHOT"]
+                 ]
   :plugins [[lein-cljsbuild "1.0.4"]
             [lein-cooper "0.0.1"] ]
   :source-paths ["src"]
   :test-paths ["test"]
   :repositories {"sonatype-oss-public" "https://oss.sonatype.org/content/groups/public/"}
-  :profiles { :dev {:source-paths ["dev" "src"]
-                    :plugins [[lein-midje "3.1.3"]]
-                    :repl-options {:init-ns user}
-                    :dependencies [[org.clojure/tools.namespace "0.2.8"]
-                                   [org.clojure/java.classpath "0.2.2"]
-                                   [midje "1.7.0-SNAPSHOT"] ]}
+  :profiles {:dev {:source-paths ["dev" "src"]
+                   :dependencies [[cider/cider-nrepl "0.9.0-SNAPSHOT"]
+                                  [org.clojure/tools.nrepl "0.2.7"]]
+                   :repl-options {:init-ns user
+                                  :nrepl-middleware
+                                  [cider.nrepl.middleware.apropos/wrap-apropos
+                                   cider.nrepl.middleware.classpath/wrap-classpath
+                                   cider.nrepl.middleware.complete/wrap-complete
+                                   cider.nrepl.middleware.format/wrap-format
+                                   cider.nrepl.middleware.info/wrap-info
+                                   cider.nrepl.middleware.inspect/wrap-inspect
+                                   cider.nrepl.middleware.macroexpand/wrap-macroexpand
+                                   cider.nrepl.middleware.ns/wrap-ns
+                                   cider.nrepl.middleware.pprint/wrap-pprint
+                                   cider.nrepl.middleware.resource/wrap-resource
+                                   cider.nrepl.middleware.stacktrace/wrap-stacktrace
+                                   cider.nrepl.middleware.test/wrap-test
+                                   cider.nrepl.middleware.trace/wrap-trace
+                                   cider.nrepl.middleware.undef/wrap-undef]}}
              :prod {:aot :all
                     :hooks [leiningen.cljsbuild]
                     :main server.system}}

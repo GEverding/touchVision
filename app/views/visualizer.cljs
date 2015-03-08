@@ -9,64 +9,28 @@
             [cljs-log.core :as log]
             [om.dom :as dom :include-macros true]
             [om.core :as om :include-macros true]
-            [sablono.core :as html :refer-macros [html]]))
+            [sablono.core :as html :refer-macros [html]]
+            [client.views.viz.plot :as plot]
+            [client.views.viz.table :as table]))
 
 (def ^:private l (log/get-logger "viz"))
 
-(defn print-data "" [data]
-  (str "{ " (map (fn [[k v]] (str k " " v "\n")) data) " }"))
-
-(defn ^:private filter-range [x low high]
-  (println (<= x high) (>= x low))
-  (and  (<= x high) (>= x low)) )
-
-(defn hide? [bounds d]
-  (let [{:keys [low high]} bounds
-        t (get-in d [:data :timestamp])]
-    (log/fine l bounds)
-    (log/fine l (< t high))
-    (and (>= t low) (< t high))))
-
-(defn ^:private update-selected [data owner e]
-  (let [c (om/get-state owner :chan ) ]
-    (put! c data)))
-
-(defcomponent data-row-view [data owner]
+(defcomponent visualizer-view
+  [app owner]
   (render
     [_]
-    ( html
-      [:code {:class "row js-row-data data-row"
-              ;; :style {:display (if is-hidden? "none" "block")}
-              :on-click #(update-selected data owner %)
-              } (print-data data)])))
-
-(defcomponent visualizer-view [app owner]
-  (init-state
-    [this]
-    {:datoms []
-     :time-bound {:low (.-MIN_VALUE js/Number) :high (.-MAX_VALUE js/Number)}})
-  (will-mount
-    [_]
-    (let [{:keys [ws-chan select-chan event-bus]} (om/get-shared owner)
-          e-chan (chan)
-          ws-sub-chan (chan (sliding-buffer 25))]
-      (async/tap (:bus event-bus) e-chan)
-      (sub ws-chan :post ws-sub-chan)
-      (go-loop
-        [[m c] (alts! [ws-sub-chan select-chan e-chan])]
-        (when m
-          (condp = c
-            ws-sub-chan (om/update-state! owner :datoms #(conj % m))
-            e-chan (if (= m :reset)
-                     (om/set-state! owner :datoms []))
-            select-chan (do
-                          (om/set-state! owner :time-bound m)))
-          (recur (alts! [ws-sub-chan select-chan e-chan]))))))
-  (render-state
-    [_ {:keys [time-bound datoms]}]
-    (html [:div {:class "row visualizer-view js-visualizer-view"}
-           (let [ds (filter (partial hide? time-bound) datoms)]
-             (if-not (empty? ds)
-               (om/build-all data-row-view ds {:key :id})
-               (log/info l "no data")))])))
-
+    (html [:div.visualizer-view
+           [:ul.nav.nav-tabs
+            [:li.active
+             [:a {:href "#3d"
+                  :data-toggle "tab"
+                  } "3D"] ]
+            [:li
+             [:a {:href "#raw"
+                  :data-toggle "tab"
+                  } "Raw"]]]
+           [:div.tab-content.visualizer-container
+            [:div.tab-pane.active#3d (plot/->plot-view app)]
+            [:div.tab-pane#raw (table/->table-view app)]]
+           ]))
+  )

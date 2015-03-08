@@ -63,7 +63,7 @@
     (let [{:keys [ws-chan event-bus]} (om/get-shared owner)
           e-chan (chan)
           ws-sub-chan (chan (sliding-buffer 25))]
-      (sub ws-chan :post ws-sub-chan)
+      (sub (:pub ws-chan) :post ws-sub-chan)
       (async/tap (:bus event-bus) e-chan)
       (go-loop
         [[m c] (async/alts! [ws-sub-chan e-chan])]

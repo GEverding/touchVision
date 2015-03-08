@@ -38,3 +38,17 @@ where r.patient_id = p.id and
       r.start_time is not null and 
       r.stop_time is null
 limit 1
+
+-- name: get-data-by-id
+-- Find all recording for a patient
+select id, pressure, x,y,z,timestamp
+from captured_data
+where recording_id=:id and
+      timestamp > :start
+order by timestamp asc
+limit :limit
+
+-- name: get-recording-data
+select id,pressure,x,y,z,timestamp
+from captured_data
+where recording_id=:id

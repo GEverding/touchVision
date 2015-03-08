@@ -17,12 +17,13 @@
 
 (defroutes app
   (GET "/" [] index)
-  (GET "/ws" [] capture-ws)
-  (PUT "/ws/config" [] configure-ws)
+  (PUT "/capture/config" [] configure-capture-device)
   (GET "/init" [] init)
   (POST "/recordings" [] new-recording)
   (ANY "/recordings/:id/start" [id :as r] (start id r))
   (ANY "/recordings/:id/stop" [id :as r] (stop id r))
+  (GET "/recordings/:id/data" [id :as r] (get-recording-data id r))
+  (GET "/recording/:id" [id :as r] (get-recording-by-id id r))
   (route/not-found "Go Away Troll"))
 
 (defn wrap-app [resources]

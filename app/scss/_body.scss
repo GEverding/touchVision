@@ -35,7 +35,9 @@ svg {
   shape-rendering: crispEdges;
 }
 
-.visualizer-view {
+.vizualizer-view {
+}
+.visualizer-container {
   height: 450px;
   overflow: scroll;
   &::-webkit-scrollbar { 
@@ -53,4 +55,46 @@ svg {
     cursor: pointer;
     color: #AD999E;
   }
+}
+
+.table>tbody>tr.pressure-0>td,
+.table>tbody>tr.pressure-0>th
+.table>tbody>tr>td.pressure-0, 
+.table>tbody>tr>th.pressure-0 {
+  background-color: #A52A2A;
+}
+
+.table>tbody>tr.pressure-1>td,
+.table>tbody>tr.pressure-1>th
+.table>tbody>tr>td.pressure-1, 
+.table>tbody>tr>th.pressure-1 {
+  background-color: #C25051;
+}
+
+.table>tbody>tr.pressure-2>td,
+.table>tbody>tr.pressure-2>th
+.table>tbody>tr>td.pressure-2, 
+.table>tbody>tr>th.pressure-2 {
+  background-color: #E09432;
+}
+
+.table>tbody>tr.pressure-3>td,
+.table>tbody>tr.pressure-3>th
+.table>tbody>tr>td.pressure-3, 
+.table>tbody>tr>th.pressure-3 {
+  background-color: #EFBD2E;
+}
+
+.table>tbody>tr.pressure-4>td,
+.table>tbody>tr.pressure-4>th
+.table>tbody>tr>td.pressure-4, 
+.table>tbody>tr>th.pressure-4 {
+  background-color: #73B845;
+}
+                                 
+.table>tbody>tr.pressure-5>td,
+.table>tbody>tr.pressure-5>th
+.table>tbody>tr>td.pressure-5, 
+.table>tbody>tr>th.pressure-5 {
+  background-color: #009BDD;
 }
