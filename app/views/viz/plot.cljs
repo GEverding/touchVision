@@ -25,6 +25,11 @@
                                  "#73B845"
                                  "#009BDD"])
 
+(defn hide? [bounds d]
+  (let [{:keys [low high]} bounds
+        t (get-in d [:timestamp])]
+    (and (>= t low) (< t high))))
+
 (defn events->chan
   "Given a target DOM element and event type return a channel of
   observed events. Can supply the channel to receive events as third
@@ -103,11 +108,8 @@
             (v (x-scale (:x-cen vpts)) (y-scale (:y-max vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-cen vpts)) (y-scale (:y-max vpts)) (z-scale (:z-min vpts)))
             (v (x-scale (:x-cen vpts)) (y-scale (:y-min vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-cen vpts)) (y-scale (:y-min vpts)) (z-scale (:z-max vpts)))
             ]]
-    (println vpts)
-    (println (x-scale (:x-max vpts)))
     (doseq [v vs]
       (-> new-line-geo .-vertices (.push v)))
-    (log/fine l "updating lineo geo")
     (. scatter-plot (remove line))
     (let [new-line (-> (js/THREE.BoxHelper. (js/THREE.Line. new-line-geo
                                                             line-material
@@ -117,8 +119,11 @@
       (. scatter-plot (add new-line))
       (om/set-state! owner :line new-line))
 
-    (let [point-geo (js/THREE.Geometry.)]
-      (doseq [d datoms]
+    (let [point-geo (js/THREE.Geometry.)
+          time-bound (om/get-state owner :time-bound)
+          ds (filter (partial hide? time-bound) datoms)]
+
+      (doseq [d ds]
         (let [x (x-scale (:x d))
               y (y-scale (:y d))
               z (z-scale (:z d))]
@@ -128,14 +133,10 @@
         (. scatter-plot (remove points))
         (. scatter-plot (add new-points))
         (om/set-state! owner :points new-points)
-
         (.clear renderer)
         (. camera (lookAt (.-position scene)))
         (. renderer (render scene camera))
-        (.log js/console renderer)))))
-
-(defn update-plot [e]
-  (log/fine l "new datoms"))
+        ))))
 
 ;; ref: http://bl.ocks.org/phil-pedruco/9852362
 (defcomponent plot-view
@@ -162,16 +163,38 @@
       :sx 0
       :sy 0
       :down false
-      :update-chan (chan)
+      :time-bound {:low (.-MIN_VALUE js/Number) :high (.-MAX_VALUE js/Number)}
       }))
   (will-mount
    [_]
    (do
+     (let [{:keys [ws-chan select-chan event-bus]} (om/get-shared owner)
+           e-chan (chan)
+           ws-sub-chan (chan (sliding-buffer 25))]
+       (async/tap (:bus event-bus) e-chan)
+       (sub (:pub ws-chan) :post ws-sub-chan)
+       (go-loop
+           [[m c] (alts! [ws-sub-chan select-chan e-chan])]
+         (when m
+           (condp = c
+             ws-sub-chan (do
+                           (om/update-state! owner :datoms #(conj % (:data m)))
+                           (render owner (om/get-state owner :datoms)))
+             select-chan (do
+                           (om/set-state! owner :time-bound m)
+                           (render owner (om/get-state owner :datoms)))
+             e-chan (if (= m :reset)
+                      (om/set-state! owner :datoms [])))
+           (recur (alts! [ws-sub-chan select-chan e-chan]))))))
+   )
+  (did-mount
+   [_]
+   (do
      (let [{:keys [:renderer :camera :scene :scatter-plot :w :h]} (om/get-state owner)
            down (chan) up (chan) move (chan)]
-       (events->chan js/window EventType.MOUSEDOWN down)
-       (events->chan js/window EventType.MOUSEUP up)
-       (events->chan js/window EventType.MOUSEMOVE move)
+       (events->chan (om/get-node owner "plot") EventType.MOUSEDOWN down)
+       (events->chan (om/get-node owner "plot") EventType.MOUSEUP up)
+       (events->chan (om/get-node owner "plot") EventType.MOUSEMOVE move)
        (go-loop [[event c] (alts! [down up move])]
          (condp = c
            down (do
@@ -192,38 +215,18 @@
                     (om/set-state! owner :sy (+ sy dy))
                     ))
            (log/warning l "nothing!"))
-         (recur (alts! [down up move])))
-       )
-     (let [{:keys [ws-chan select-chan event-bus]} (om/get-shared owner)
-           e-chan (chan)
-           ws-sub-chan (chan (sliding-buffer 25))]
-       (async/tap (:bus event-bus) e-chan)
-       (sub (:pub ws-chan) :post ws-sub-chan)
-       (go-loop
-           [[m c] (alts! [ws-sub-chan e-chan])]
-
-         (when m
-           (condp = c
-             ws-sub-chan (do
-                           (om/update-state! owner :datoms #(conj % (:data m)))
-                           (render owner (om/get-state owner :datoms))))
-           e-chan (if (= m :reset)
-                    (om/set-state! owner :datoms []))
-           (recur (alts! [ws-sub-chan select-chan e-chan]))))))
-   )
-  (did-mount
-   [_]
-   (let [{:keys [renderer camera scene scatter-plot w h]} (om/get-state owner)]
-     (. renderer (setSize w h))
-     (dommy/append! (om/get-node owner "plot") (.-domElement renderer))
-     (. renderer (setClearColor 0xEEEEEE 1.0))
-     (. scene (add scatter-plot))
-     (aset camera "position" "x" 200)
-     (aset camera "position" "y" -100)
-     (aset camera "position" "z" 100)
-     (aset scatter-plot "rotation" "y" 0)
-     (render owner (om/get-state owner :datoms))
-     (animate renderer camera scene (.getTime (js/Date.))))
+         (recur (alts! [down up move]))))
+     (let [{:keys [renderer camera scene scatter-plot w h]} (om/get-state owner)]
+       (. renderer (setSize w h))
+       (dommy/append! (om/get-node owner "plot") (.-domElement renderer))
+       (. renderer (setClearColor 0xEEEEEE 1.0))
+       (. scene (add scatter-plot))
+       (aset camera "position" "x" 200)
+       (aset camera "position" "y" -100)
+       (aset camera "position" "z" 100)
+       (aset scatter-plot "rotation" "y" 0)
+       (render owner (om/get-state owner :datoms))
+       (animate renderer camera scene (.getTime (js/Date.)))))
 
    )
   (render
