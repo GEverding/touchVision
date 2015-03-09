@@ -54,7 +54,8 @@
                 line-material
                 points
                 p-mat
-                w h ]} (om/get-state owner)
+                w h ]}
+        (om/get-state owner)
         new-line-geo (js/THREE.Geometry.)
         x-event (-> d3 (.extent datoms #(:x %)))
         y-event (-> d3 (.extent datoms #(:y %)))
@@ -78,59 +79,61 @@
             (v (x-scale (:x-cen vpts)) (y-scale (:y-min vpts)) (z-scale (:z-cen vpts))) (v (x-scale (:x-cen vpts)) (y-scale (:y-max vpts)) (z-scale (:z-cen vpts)))
             (v (x-scale (:x-cen vpts)) (y-scale (:y-cen vpts)) (z-scale (:z-max vpts))) (v (x-scale (:x-cen vpts)) (y-scale (:y-cen vpts)) (z-scale (:z-min vpts)))
             (v (x-scale (:x-min vpts)) (y-scale (:y-max vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-max vpts)) (z-scale (:z-min vpts)))
-            (v (x-scale (:x-min vpts)) (y-scale (:y-min vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-min vpts)) (z-scale (:z-min vpts)))
-            (v (x-scale (:x-min vpts)) (y-scale (:y-max vpts)) (z-scale (:z-max vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-max vpts)) (z-scale (:z-max vpts)))
-            (v (x-scale (:x-min vpts)) (y-scale (:y-min vpts)) (z-scale (:z-max vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-min vpts)) (z-scale (:z-max vpts)))
-            (v (x-scale (:x-min vpts)) (y-scale (:y-cen vpts)) (z-scale (:z-max vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-cen vpts)) (z-scale (:z-max vpts)))
-            (v (x-scale (:x-min vpts)) (y-scale (:y-cen vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-cen vpts)) (z-scale (:z-min vpts)))
-            (v (x-scale (:x-min vpts)) (y-scale (:y-max vpts)) (z-scale (:z-cen vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-max vpts)) (z-scale (:z-cen vpts)))
-            (v (x-scale (:x-min vpts)) (y-scale (:y-min vpts)) (z-scale (:z-cen vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-min vpts)) (z-scale (:z-cen vpts)))
-            (v (x-scale (:x-max vpts)) (y-scale (:y-min vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-max vpts)) (z-scale (:z-min vpts)))
-            (v (x-scale (:x-min vpts)) (y-scale (:y-min vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-min vpts)) (y-scale (:y-max vpts)) (z-scale (:z-min vpts)))
-            (v (x-scale (:x-max vpts)) (y-scale (:y-min vpts)) (z-scale (:z-max vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-max vpts)) (z-scale (:z-max vpts)))
-            (v (x-scale (:x-min vpts)) (y-scale (:y-min vpts)) (z-scale (:z-max vpts))) (v (x-scale (:x-min vpts)) (y-scale (:y-max vpts)) (z-scale (:z-max vpts)))
-            (v (x-scale (:x-cen vpts)) (y-scale (:y-min vpts)) (z-scale (:z-max vpts))) (v (x-scale (:x-cen vpts)) (y-scale (:y-max vpts)) (z-scale (:z-max vpts)))
-            (v (x-scale (:x-cen vpts)) (y-scale (:y-min vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-cen vpts)) (y-scale (:y-max vpts)) (z-scale (:z-min vpts)))
-            (v (x-scale (:x-max vpts)) (y-scale (:y-min vpts)) (z-scale (:z-cen vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-max vpts)) (z-scale (:z-cen vpts)))
-            (v (x-scale (:x-min vpts)) (y-scale (:y-min vpts)) (z-scale (:z-cen vpts))) (v (x-scale (:x-min vpts)) (y-scale (:y-max vpts)) (z-scale (:z-cen vpts)))
-            (v (x-scale (:x-max vpts)) (y-scale (:y-max vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-max vpts)) (z-scale (:z-max vpts)))
-            (v (x-scale (:x-max vpts)) (y-scale (:y-min vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-min vpts)) (z-scale (:z-max vpts)))
-            (v (x-scale (:x-min vpts)) (y-scale (:y-max vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-min vpts)) (y-scale (:y-max vpts)) (z-scale (:z-max vpts)))
-            (v (x-scale (:x-min vpts)) (y-scale (:y-min vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-min vpts)) (y-scale (:y-min vpts)) (z-scale (:z-max vpts)))
-            (v (x-scale (:x-min vpts)) (y-scale (:y-cen vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-min vpts)) (y-scale (:y-cen vpts)) (z-scale (:z-max vpts)))
-            (v (x-scale (:x-max vpts)) (y-scale (:y-cen vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-cen vpts)) (z-scale (:z-max vpts)))
-            (v (x-scale (:x-cen vpts)) (y-scale (:y-max vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-cen vpts)) (y-scale (:y-max vpts)) (z-scale (:z-min vpts)))
-            (v (x-scale (:x-cen vpts)) (y-scale (:y-min vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-cen vpts)) (y-scale (:y-min vpts)) (z-scale (:z-max vpts)))
+            ;; (v (x-scale (:x-min vpts)) (y-scale (:y-min vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-min vpts)) (z-scale (:z-min vpts)))
+            ;; (v (x-scale (:x-min vpts)) (y-scale (:y-max vpts)) (z-scale (:z-max vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-max vpts)) (z-scale (:z-max vpts)))
+            ;; (v (x-scale (:x-min vpts)) (y-scale (:y-min vpts)) (z-scale (:z-max vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-min vpts)) (z-scale (:z-max vpts)))
+            ;; (v (x-scale (:x-min vpts)) (y-scale (:y-cen vpts)) (z-scale (:z-max vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-cen vpts)) (z-scale (:z-max vpts)))
+            ;; (v (x-scale (:x-min vpts)) (y-scale (:y-cen vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-cen vpts)) (z-scale (:z-min vpts)))
+            ;; (v (x-scale (:x-min vpts)) (y-scale (:y-max vpts)) (z-scale (:z-cen vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-max vpts)) (z-scale (:z-cen vpts)))
+            ;; (v (x-scale (:x-min vpts)) (y-scale (:y-min vpts)) (z-scale (:z-cen vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-min vpts)) (z-scale (:z-cen vpts)))
+            ;; (v (x-scale (:x-max vpts)) (y-scale (:y-min vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-max vpts)) (z-scale (:z-min vpts)))
+            ;; (v (x-scale (:x-min vpts)) (y-scale (:y-min vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-min vpts)) (y-scale (:y-max vpts)) (z-scale (:z-min vpts)))
+            ;; (v (x-scale (:x-max vpts)) (y-scale (:y-min vpts)) (z-scale (:z-max vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-max vpts)) (z-scale (:z-max vpts)))
+            ;; (v (x-scale (:x-min vpts)) (y-scale (:y-min vpts)) (z-scale (:z-max vpts))) (v (x-scale (:x-min vpts)) (y-scale (:y-max vpts)) (z-scale (:z-max vpts)))
+            ;; (v (x-scale (:x-cen vpts)) (y-scale (:y-min vpts)) (z-scale (:z-max vpts))) (v (x-scale (:x-cen vpts)) (y-scale (:y-max vpts)) (z-scale (:z-max vpts)))
+            ;; (v (x-scale (:x-cen vpts)) (y-scale (:y-min vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-cen vpts)) (y-scale (:y-max vpts)) (z-scale (:z-min vpts)))
+            ;; (v (x-scale (:x-max vpts)) (y-scale (:y-min vpts)) (z-scale (:z-cen vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-max vpts)) (z-scale (:z-cen vpts)))
+            ;; (v (x-scale (:x-min vpts)) (y-scale (:y-min vpts)) (z-scale (:z-cen vpts))) (v (x-scale (:x-min vpts)) (y-scale (:y-max vpts)) (z-scale (:z-cen vpts)))
+            ;; (v (x-scale (:x-max vpts)) (y-scale (:y-max vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-max vpts)) (z-scale (:z-max vpts)))
+            ;; (v (x-scale (:x-max vpts)) (y-scale (:y-min vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-min vpts)) (z-scale (:z-max vpts)))
+            ;; (v (x-scale (:x-min vpts)) (y-scale (:y-max vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-min vpts)) (y-scale (:y-max vpts)) (z-scale (:z-max vpts)))
+            ;; (v (x-scale (:x-min vpts)) (y-scale (:y-min vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-min vpts)) (y-scale (:y-min vpts)) (z-scale (:z-max vpts)))
+            ;; (v (x-scale (:x-min vpts)) (y-scale (:y-cen vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-min vpts)) (y-scale (:y-cen vpts)) (z-scale (:z-max vpts)))
+            ;; (v (x-scale (:x-max vpts)) (y-scale (:y-cen vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-max vpts)) (y-scale (:y-cen vpts)) (z-scale (:z-max vpts)))
+            ;; (v (x-scale (:x-cen vpts)) (y-scale (:y-max vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-cen vpts)) (y-scale (:y-max vpts)) (z-scale (:z-min vpts)))
+            ;; (v (x-scale (:x-cen vpts)) (y-scale (:y-min vpts)) (z-scale (:z-min vpts))) (v (x-scale (:x-cen vpts)) (y-scale (:y-min vpts)) (z-scale (:z-max vpts)))
             ]]
-     (doseq [v vs]
-       (-> new-line-geo .-vertices (.push v)))
-     (log/fine l "updating lineo geo")
-     (. scatter-plot (remove line))
-     (let [new-line (js/THREE.Line. new-line-geo
-                                    line-material
-                                    (.-Lines js/THREE))]
-       (.log js/console new-line)
-       (. scatter-plot (add new-line))
-       (om/set-state! owner :line new-line))
+    (println vpts)
+    (println (x-scale (:x-max vpts)))
+    (doseq [v vs]
+      (-> new-line-geo .-vertices (.push v)))
+    (log/fine l "updating lineo geo")
+    (. scatter-plot (remove line))
+    (let [new-line (-> (js/THREE.BoxHelper. (js/THREE.Line. new-line-geo
+                                                            line-material
+                                                            (.-Lines js/THREE)))
+                       )]
+      (.log js/console new-line)
+      (. (aget new-line "material" "color") (set 0x000000))
+      (. scatter-plot (add new-line))
+      (om/set-state! owner :line new-line))
 
-     (let [point-geo (js/THREE.Geometry.)]
-       (doseq [d datoms]
-         (let [x (x-scale (:x d))
-               y (y-scale (:y d))
-               z (z-scale (:z d))]
-           (log/fine l d)
-           (-> point-geo .-vertices (.push (v x y z)))
-           (-> point-geo .-colors (.push (js/THREE.Color. (nth pressure-colours (int (:pressure d))))))))
-       (let [new-points (js/THREE.PointCloud. point-geo p-mat)]
-         (.log js/console )
-         (. scatter-plot (remove points))
-         (. scatter-plot (add new-points))
-         (om/set-state! owner :points new-points)
+    (let [point-geo (js/THREE.Geometry.)]
+      (doseq [d datoms]
+        (let [x (x-scale (:x d))
+              y (y-scale (:y d))
+              z (z-scale (:z d))]
+          (-> point-geo .-vertices (.push (v x y z)))
+          (-> point-geo .-colors (.push (js/THREE.Color. (nth pressure-colours (int (:pressure d))))))))
+      (let [new-points (js/THREE.PointCloud. point-geo p-mat)]
+        (. scatter-plot (remove points))
+        (. scatter-plot (add new-points))
+        (om/set-state! owner :points new-points)
 
-         (.clear renderer)
-         (. camera (lookAt (.-position scene)))
-         (. renderer (render scene camera))
-         (.log js/console renderer)))))
+        (.clear renderer)
+        (. camera (lookAt (.-position scene)))
+        (. renderer (render scene camera))
+        (.log js/console renderer)))))
 
 (defn update-plot [e]
   (log/fine l "new datoms"))
@@ -143,7 +146,7 @@
    (let [w 950 h 500
          line-geo (js/THREE.Geometry.)
          line-material (js/THREE.LineBasicMaterial.  (clj->js  {:color 0x000000
-                                                                :lineWidth 2}))]
+                                                                :lineWidth 1}))]
      {:renderer (js/THREE.WebGLRenderer. (clj->js {:antialias true}))
       :camera (js/THREE.PerspectiveCamera. 45 (/ w h) 1 10000)
       :scene (js/THREE.Scene.)
@@ -171,11 +174,6 @@
        (events->chan js/window EventType.MOUSEUP up)
        (events->chan js/window EventType.MOUSEMOVE move)
        (go-loop [[event c] (alts! [down up move])]
-         (.log js/console event)
-         (.log js/console "up: " (= up c))
-         (.log js/console "down: " (= down c))
-         (.log js/console "move: " (= move c))
-         (.log js/console "c: " c)
          (condp = c
            down (do
                   (log/fine l "DOWN")
@@ -183,16 +181,12 @@
                   (om/set-state! owner :sx (.-clientX event))
                   (om/set-state! owner :sy (.-clientY event)))
            up (do
-                (log/fine l "UP") 
+                (log/fine l "UP")
                 (om/set-state! owner :down false))
            move (when (om/get-state owner :down)
-                  (println (om/get-state owner))
                   (let [{:keys [sx sy]} (om/get-state owner)
                         dx (- (.-clientX event) sx)
                         dy (- (.-clientY event) sy)]
-                    (.log js/console sx sy)
-                    (.log js/console dx dy)
-                    (.log js/console (aget scatter-plot "rotation" "y"))
                     (aset scatter-plot "rotation" "y" (+ (aget scatter-plot "rotation" "y") (* dx 0.01)))
                     (aset camera "position" "y" (+ (aget camera "position" "y") dy))
                     (om/set-state! owner :sx (+ sx dx))
@@ -208,7 +202,7 @@
        (sub (:pub ws-chan) :post ws-sub-chan)
        (go-loop
            [[m c] (alts! [ws-sub-chan e-chan])]
-         
+
          (when m
            (condp = c
              ws-sub-chan (do
@@ -232,7 +226,7 @@
      (render owner (om/get-state owner :datoms))
      (animate renderer camera scene (.getTime (js/Date.))))
 
-  ) 
+  )
   (render
    [_]
    (html [:div.plot-view {:ref "plot"}])))
