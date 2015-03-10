@@ -41,7 +41,7 @@
   (render [_]
     (let [current-mode (:mode app)
           is-active? (fn [mode] (= mode (:mode app))) ]
-      (html [:div {:class "col-sm-6 switch-container" }
+      (html [:div {:class "col-sm-6 col-md-12 switch-container" }
              [:button {:type "button"
                        :class (str "btn btn-info col-sm-6 "
                                    (if (is-active? :live)
@@ -61,16 +61,16 @@
 (defcomponent clear-view [app owner]
   (render
     [_]
-    (html [:div {:class "col-sm-3 clear-container"}
+    (html [:div {:class "col-sm-3 col-md-12 clear-container"}
            [:button {:type "button"
-                     :class "btn btn-warning "
+                     :class "btn btn-warning btn-block"
                      :on-click (fn [_] (clear-screen app owner))
                      } "Clear"]])))
 
 (defcomponent zero-view [app owner]
   (render
     [_]
-    (html [:div {:class "col-sm-3 zero-container"}
+    (html [:div {:class "col-sm-3 col-md-12 zero-container"}
            [:button {:type "button"
                      :class (str "btn btn-danger btn-block ") :on-click (fn [_] (zero-position! app owner)) } "Zero" ]])))
 
@@ -80,11 +80,10 @@
   (render
     [_]
     (let []
-      (html [:div.option-container.col-sm-6.col-md-2
+      (html [:div.option-container.col-sm-6.col-md-12
              [:h3 "Capture Controls"]
              [:div.option-group
               (->switch-view app)
               (->clear-view app)
               (->zero-view app) ]
              ]))))
-

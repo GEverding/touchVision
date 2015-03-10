@@ -62,7 +62,7 @@
   (render-state
     [_ state]
     (let [recording-id (:recording-id state)]
-      (html [:div {:class "rec-container col-md-2 col-sm-6"}
+      (html [:div {:class "rec-container col-md-12 col-sm-6"}
              [:h3 "Recording Controls"]
              [:div.option-group
               [:div.col-sm-4

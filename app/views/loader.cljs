@@ -37,7 +37,7 @@
 (defcomponent loader-view [app owner]
   (render
    [_]
-   (html [:div {:class "loading-container col-md-2 col-sm-6"}
+   (html [:div {:class "loading-container col-md-12 col-sm-6"}
              [:h3 "Load Recording"]
              [:div.option-group
               [:div.col-sm-6
@@ -50,4 +50,3 @@
                          :on-click (fn [_] (load-recording app owner))
                          } "Load"]]
                ]])))
-
