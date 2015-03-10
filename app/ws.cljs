@@ -25,7 +25,7 @@
                 (let [ds (-> res :body :data)]
                   (do
                     (doseq [d ds]
-                      (do
+                      (when (< 2 (:pressure d))
                         (put! out {:type :post :data d})))
                     (reset! start (-> ds last :timestamp)))
                   )))))))))
