@@ -184,7 +184,9 @@
                            (om/set-state! owner :time-bound m)
                            (render owner (om/get-state owner :datoms)))
              e-chan (if (= m :reset)
-                      (om/set-state! owner :datoms [])))
+                      (do
+                        (om/set-state! owner :datoms [])
+                        (render owner (om/get-state owner :datoms)))))
            (recur (alts! [ws-sub-chan select-chan e-chan]))))))
    )
   (did-mount
