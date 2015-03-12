@@ -24,10 +24,10 @@ def main(argv):
         elif opt in ("-p", "--playback"):
             playback_tty = arg
     glove = Glove(ex, glove_tty, debug)
-    # playback = Playback(ex, playback_tty)
+    playback = Playback(ex, playback_tty, debug)
     try:
         glove.start()
-        # playback.start();
+        playback.start();
         while True:
             time.sleep(.3)
 
@@ -35,7 +35,7 @@ def main(argv):
     except KeyboardInterrupt:
         print "Stopping"
         glove.stop()
-        # playback.stop()
+        playback.stop()
 
 if __name__ == '__main__':
     main(sys.argv[1:])

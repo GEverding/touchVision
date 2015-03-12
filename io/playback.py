@@ -4,8 +4,13 @@ import serial
 from functools import partial
 
 class Playback(object):
-  def __init__(self, exchange, tty):
-    self.serial = serial.Serial(tty, 115200)
+  def __init__(self, exchange, tty, debug):
+    if not debug:
+      self.serial = serial.Serial(tty, 115200)
+    else:
+      self.serial = None
+
+    self.debug = debug
     self.connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     self.channel = self.connection.channel()
     # channel.queue_declare(queue='glove')
@@ -20,19 +25,18 @@ class Playback(object):
     self.channel.queue_bind(exchange=exchange,
                        routing_key="glove",
                        queue=self.glove_queue_name)
-    self.channel.basic_consume(partial(playback_callback, ser=self.serial), queue=self.playback_queue_name, no_ack=True)
+    self.channel.basic_consume(self.playback_callback, queue=self.playback_queue_name, no_ack=True)
 
 
   def start(self):
     self.channel.start_consuming()
 
-
   def stop(self):
     self.channel.stop_consuming()
 
-
   def playback_callback(self, ch, method, properties, body):
     decoded = json.loads(body)
-    pressure = int(body['pressure'])
+    pressure = int(decoded['pressure'])
     print " [x] %r:%r" % (method.routing_key, pressure)
-    self.serial.write(str(pressure));
+    if not self.debug:
+        self.serial.write(str(pressure));
