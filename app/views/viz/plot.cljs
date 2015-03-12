@@ -170,24 +170,26 @@
    (do
      (let [{:keys [ws-chan select-chan event-bus]} (om/get-shared owner)
            e-chan (chan)
+           s-chan (chan)
            ws-sub-chan (chan (sliding-buffer 25))]
        (async/tap (:bus event-bus) e-chan)
+       (async/tap (:bus select-chan) s-chan)
        (sub (:pub ws-chan) :post ws-sub-chan)
        (go-loop
-           [[m c] (alts! [ws-sub-chan select-chan e-chan])]
+           [[m c] (alts! [ws-sub-chan s-chan e-chan])]
          (when m
            (condp = c
              ws-sub-chan (do
                            (om/update-state! owner :datoms #(conj % (:data m)))
                            (render owner (om/get-state owner :datoms)))
-             select-chan (do
+             s-chan (do
                            (om/set-state! owner :time-bound m)
                            (render owner (om/get-state owner :datoms)))
              e-chan (if (= m :reset)
                       (do
                         (om/set-state! owner :datoms [])
                         (render owner (om/get-state owner :datoms)))))
-           (recur (alts! [ws-sub-chan select-chan e-chan]))))))
+           (recur (alts! [ws-sub-chan s-chan e-chan]))))))
    )
   (did-mount
    [_]

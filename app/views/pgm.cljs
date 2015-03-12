@@ -24,7 +24,7 @@
 (defn ^:private brushed [app owner]
   (let [brush (om/get-state owner [:d3-props :brush])
         rng (.extent brush)
-        ch (:select-chan (om/get-shared owner))
+        ch (get-in (om/get-shared owner) [:select-chan :chan])
         brush-empty? (.empty brush)
         low (nth rng 0)
         high (nth rng 1)]
@@ -130,4 +130,3 @@
                                          :height height
                                          :margin margin }})
              ]))))
-

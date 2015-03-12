@@ -53,11 +53,17 @@
               :event-bus event-bus}}))
 
 (defn main []
-  (let [stream (ws/start! app-state)
+  (let [
         select-chan (chan)
+        select-chan-multi (async/mult select-chan)
+        select-bus {:bus select-chan-multi :chan select-chan}
+
         event-bus (chan 5)
         event-bus-mult (async/mult event-bus)
+        bus {:bus event-bus-mult :chan event-bus}
+
         ch (chan (sliding-buffer 25))
+        stream (ws/start! app-state bus)
         init-chan (r {:type :get :url "/init"})]
     (go
       (let [res (<! init-chan)]
@@ -70,7 +76,7 @@
                                  v))]
             (log/fine l new-app-state)
             (reset! app-state new-app-state)
-            (index stream select-chan {:bus event-bus-mult :chan event-bus})))))
+            (index stream select-bus bus)))))
     ;; (go
     ;;   (loop [m (<! ch)]
     ;;     (when m

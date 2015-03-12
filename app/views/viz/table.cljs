@@ -50,32 +50,36 @@
     [_]
     (let [{:keys [ws-chan select-chan event-bus]} (om/get-shared owner)
           e-chan (chan)
+          s-chan (chan)
           ws-sub-chan (chan (sliding-buffer 25))]
       (async/tap (:bus event-bus) e-chan)
+      (async/tap (:bus select-chan) s-chan)
       (sub (:pub ws-chan) :post ws-sub-chan)
       (go-loop
-        [[m c] (alts! [ws-sub-chan select-chan e-chan])]
+        [[m c] (alts! [ws-sub-chan s-chan e-chan])]
         (when m
           (condp = c
-            ws-sub-chan (om/update-state! owner :datoms #(conj % m))
+            ws-sub-chan (om/update-state! owner :datoms #(conj % (:data m)))
             e-chan (if (= m :reset)
                      (om/set-state! owner :datoms []))
-            select-chan (do
-                          (om/set-state! owner :time-bound m)))
-          (recur (alts! [ws-sub-chan select-chan e-chan]))))))
+            s-chan (do
+                     (om/set-state! owner :time-bound m)))
+          (recur (alts! [ws-sub-chan s-chan e-chan]))))))
   (render-state
     [_ {:keys [time-bound datoms]}]
-    (html [:table.table.table-hover.table-striped
-           [:thead
-            [:tr
-             [:th "X"]
-             [:th "Y"]
-             [:th "Z"]
-             [:th "Pressure"]
-             [:th "Timestamp"]]]
-           [:tbody
-           (let [ds (filter (partial hide? time-bound) datoms)]
-             (if-not (empty? ds)
-               (om/build-all data-row-view ds {:key :id})
-               (log/info l "no data")))]])))
-
+    (html
+     (let [ds (filter (partial hide? time-bound) datoms)]
+       [:table.table.table-hover.table-striped
+        [:thead
+         [:tr
+          [:th "X"]
+          [:th "Y"]
+          [:th "Z"]
+          [:th "Pressure"]
+          [:th "Timestamp"]]]
+        [:tbody
+         (if-not (empty? ds)
+           (om/build-all data-row-view ds {:key :id})
+           (log/info l "no data"))]
+        [:tfoot
+         [:tr [:span (str (count ds) " / " (count datoms))]]]]))))
