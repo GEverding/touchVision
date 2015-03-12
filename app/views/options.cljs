@@ -13,7 +13,7 @@
 (defn- sync-app
   [data]
   (r {:type :put
-            :url "/ws/config"
+            :url "/capture/config"
            :data data}))
 
 (defn switch! [app owner new-state]
@@ -22,6 +22,7 @@
       (om/update! app :mode new-state)
       (sync-app @app)
       (put! event-bus :reset))))
+
 
 (defn clear-screen [app owner]
   (let [event-bus (om/get-shared owner [:event-bus :chan])]
