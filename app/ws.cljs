@@ -16,8 +16,8 @@
     (when recording-id
       (let [cb (r {:type :get
                     :url (str "/recordings/" recording-id "/data")
-                    :data {:limit 100
-                             :start @start}})]
+                   :data {:limit 100
+                          :start @start}})]
 
         (go
           (let [res (<! cb)]
@@ -44,7 +44,7 @@
             (log/info l "resetting start timestamp")
             (reset! start 0)))
         (recur (<! e-chan))))
-    (js/setInterval fetch 2000 app-state out)
+    (js/setInterval fetch 500 app-state out)
 
     {:pub stdout
      :chan out}))
