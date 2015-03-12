@@ -22,7 +22,7 @@
                                        :db db
                                        :rabbit rabbit })
                             {:port port
-                             :thread threads}))
+                             :thread 1}))
         (assoc this :app server)))
 
   (stop [this]
@@ -35,4 +35,3 @@
 
 (defn start-app [port threads]
   (map->App {:port port :threads threads}))
-

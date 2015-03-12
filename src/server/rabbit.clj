@@ -13,7 +13,6 @@
 
 (defn ^:private message-cb [stdin ch {:keys [content-type delivery-tag type] :as meta}  ^bytes payload]
   (let [blob (decode (String. payload "UTF-8") true) ]
-    (println blob)
     (put! stdin {:type :glove :data blob})))
 
 (defrecord Rabbit []
@@ -43,7 +42,8 @@
           (assoc :rmq-conn conn)
           (assoc :rmq-ch ch) )))
   (stop [this]
-    (rmq/close (:rmq-conn this))
+    (rmq/close (:rmq-ch this))
+    ;; (rmq/close (:rmq-conn this))
     (close! (:stdin this))
     (close! (:out this))
     (close! (:capture-in this))

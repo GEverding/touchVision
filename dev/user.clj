@@ -24,7 +24,7 @@
               :user (env :pg-user)
               :password (env :pg-pass)
               :init-pool-size 2
-              :max-pool-size 20
+              :max-pool-size 2
               :partitions 1})
 
 (def system
