@@ -180,7 +180,10 @@
          (when m
            (condp = c
              ws-sub-chan (do
-                           (om/update-state! owner :datoms #(conj % (:data m)))
+                           (om/update-state! owner :datoms (fn [datoms]
+                                                             (if (< 2 (get-in m [:data :pressure]))
+                                                               (conj datoms (:data m))
+                                                               datoms)))
                            (render owner (om/get-state owner :datoms)))
              s-chan (do
                            (om/set-state! owner :time-bound m)
