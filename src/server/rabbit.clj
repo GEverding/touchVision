@@ -14,7 +14,7 @@
 (defn ^:private message-cb [stdin ch {:keys [content-type delivery-tag type] :as meta}  ^bytes payload]
   (let [blob (decode (String. payload "UTF-8") true) ]
     (println blob)
-    (put! stdin (:type :glove :data blob))))
+    (put! stdin {:type :glove :data blob})))
 
 (defrecord Rabbit []
   component/Lifecycle

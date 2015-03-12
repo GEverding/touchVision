@@ -30,4 +30,3 @@
   (-> app
       (wrap-resources resources)
       wrap-middleware))
-
