@@ -1,9 +1,11 @@
 (ns server.handlers.recordings
   (:use plumbing.core)
   (:require [clojure.core.async :refer [<!  >! take! put! close! chan sliding-buffer dropping-buffer go-loop]]
-            [taoensso.timbre :as timbre :refer (info)]
+            [taoensso.timbre :as timbre :refer (info infof)]
             [cheshire.core :as json :refer [decode encode generate-string]]
             [server.db.queries :as q]
+            [langohr.exchange  :as le]
+            [langohr.basic     :as lb]
             [server.io.writer :as writer]
             [server.handlers.utils.res :refer (res)]))
 
@@ -54,3 +56,12 @@
             :data (vec data)})
       (res {:err "no data"
             :data {:recording-id id}}))))
+
+(defn start-playback [req]
+  (let [pressure (get-in req [:body :pressure])
+        rmq-ch (get-in req [:resources :rabbit :rmq-ch])]
+    (le/direct rmq-ch "touchvision")
+    (infof "[playback]: sending %d" pressure)
+    (lb/publish rmq-ch "touchvision" "playback"  (encode (:body req)) {:content-type "text/plain"})
+    (res {:msg "sent"
+          :data (:body req)})))

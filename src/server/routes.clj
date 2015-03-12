@@ -20,6 +20,7 @@
   (PUT "/capture/config" [] configure-capture-device)
   (GET "/init" [] init)
   (POST "/recordings" [] new-recording)
+  (POST "/playback" [] start-playback)
   (ANY "/recordings/:id/start" [id :as r] (start id r))
   (ANY "/recordings/:id/stop" [id :as r] (stop id r))
   (GET "/recordings/:id/data" [id :as r] (get-recording-data id r))
