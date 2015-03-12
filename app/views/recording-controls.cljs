@@ -57,13 +57,17 @@
   (init-state
     [_]
     {:state :stopped ;; :ready :started :stopped
-     :recording-id nil})
-
+     })
   (render-state
     [_ state]
-    (let [recording-id (:recording-id state)]
+    (let [recording-id (:recording-id app)
+          s (:state state)]
       (html [:div {:class "rec-container col-md-12 col-sm-6"}
              [:h3 "Recording Controls"]
+             [:div
+              [:span (str "Current Recording: " recording-id)]]
+             [:div
+              [:span (str "Recording State: " s)]]
              [:div.option-group
               [:div.col-sm-4
                [:button {:type "button"
