@@ -22,7 +22,7 @@
 
 (defn hide? [bounds d]
   (let [{:keys [low high]} bounds
-        t (get-in d [:data :timestamp])]
+        t (get-in d [:timestamp])]
     (and (>= t low) (< t high))))
 
 (defn ^:private update-selected [data owner e]
@@ -32,7 +32,7 @@
 (defcomponent data-row-view [data owner]
   (render
     [_]
-    (let [d (:data data)]
+    (let [d data]
     (html
       [:tr {:on-click #(update-selected data owner %) }
        [:td (:x d)]
