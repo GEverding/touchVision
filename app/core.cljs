@@ -14,7 +14,7 @@
             [client.views.options :refer (->options-view)]
             [client.views.loader :refer (->loader-view)]
             [client.views.recording-controls :refer (->recording-controls-view)]
-            ;; [client.views.downloader :refer [downloader-view]]
+            [client.views.downloader :refer (->downloader-view)]
             [client.ws :as ws]
             [client.request :refer (r)]))
 
@@ -25,7 +25,7 @@
 
 (def app-state (atom nil))
 
-(defn index [ws-chan select-chan event-bus]
+(defn index [ws-chan download-chan select-chan event-bus]
   (om/root
     (fn [app owner]
       (om/component
@@ -39,6 +39,7 @@
                   (->options-view app)
                   (->recording-controls-view app)
                   (->loader-view app)
+                  (->downloader-view app)
                   ]
                  [:div {:class "col-md-10 col-sm-12"}
                  (->visualizer-view app)
@@ -49,6 +50,7 @@
     app-state
     {:target (sel1 ".js-app")
      :shared {:ws-chan ws-chan
+              :download-chan download-chan
               :select-chan select-chan
               :event-bus event-bus}}))
 
@@ -61,6 +63,8 @@
         event-bus (chan 5)
         event-bus-mult (async/mult event-bus)
         bus {:bus event-bus-mult :chan event-bus}
+
+        download-chan (chan)
 
         ch (chan (sliding-buffer 25))
         stream (ws/start! app-state bus)
@@ -76,7 +80,7 @@
                                  v))]
             (log/fine l new-app-state)
             (reset! app-state new-app-state)
-            (index stream select-bus bus)))))
+            (index stream download-chan select-bus bus)))))
     ;; (go
     ;;   (loop [m (<! ch)]
     ;;     (when m

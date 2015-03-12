@@ -26,7 +26,7 @@
     (and (>= t low) (< t high))))
 
 (defn ^:private update-selected [data owner e]
-  (let [c (om/get-state owner :chan ) ]
+  (let [c (om/get-shared owner :download-chan ) ]
     (put! c data)))
 
 (defcomponent data-row-view [data owner]
