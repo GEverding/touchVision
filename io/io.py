@@ -5,7 +5,9 @@ from playback import Playback
 
 def main(argv):
     ex = "touchvision"
+    glove = None
     glove_tty = ""
+    playback = None
     playback_tty = ""
     debug = False
     try:
@@ -21,21 +23,22 @@ def main(argv):
             debug = True
         elif opt in ("-g", "--glove"):
             glove_tty = arg
+            glove = Glove(ex, glove_tty, debug)
         elif opt in ("-p", "--playback"):
             playback_tty = arg
-    glove = Glove(ex, glove_tty, debug)
-    playback = Playback(ex, playback_tty, debug)
+            playback = Playback(ex, playback_tty, debug)
     try:
-        glove.start()
-        playback.start();
+        if glove:
+            glove.start()
+        if playback:
+            playback.start();
         while True:
             time.sleep(.3)
 
-
     except KeyboardInterrupt:
         print "Stopping"
-        glove.stop()
-        playback.stop()
+        if glove: glove.stop()
+        if playback: playback.stop()
 
 if __name__ == '__main__':
     main(sys.argv[1:])
