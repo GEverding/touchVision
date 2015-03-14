@@ -6,7 +6,7 @@ from functools import partial
 class Playback(object):
   def __init__(self, exchange, tty, debug):
     if not debug:
-      self.serial = serial.Serial(tty, 115200)
+      self.serial = serial.Serial(tty, 9600)
     else:
       self.serial = None
 
