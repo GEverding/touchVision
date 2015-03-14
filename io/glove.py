@@ -13,37 +13,40 @@ from random import uniform, randint, randrange
 def read_from_serial(s, connection, channel, kinematics, debug):
 
     if not debug:
+        i = 1
         while True:
             incoming_data = s.readline()
-            # print(incoming_data)
+            print(incoming_data)
             if "DMP ready! Waiting for first interrupt..." in incoming_data:
                 break
 
         while True:
             stdin = s.readline()
             packet = stdin.split(const.PACKET_DELIMINATOR)
-            for sub_packet in packet:
-                # print(sub_packet)
-                data = sub_packet.split(const.SUB_PACKET_DELIMINATOR)
-                kinematics.process_acceleration_sample([float(data[0]), float(data[1]), float(data[2])], float(data[3]), float(data[4]))
-                [t, x, y, z, pressure] = kinematics.get_latest_measurements()
+            if i % 10 == 0:
+                for sub_packet in packet:
+                    # print(sub_packet)
+                    data = sub_packet.split(const.SUB_PACKET_DELIMINATOR)
+                    kinematics.process_acceleration_sample([float(data[0]), float(data[1]), float(data[2])], float(data[3]), float(data[4]))
+                    [t, x, y, z, pressure] = kinematics.get_latest_measurements()
 
-                payload = {}
-                payload['timestamp'] = t
-                payload['x'] = x
-                payload['y'] = y
-                payload['z'] = z
-                payload['pressure'] = pressure
+                    payload = {}
+                    payload['timestamp'] =time.time()
+                    payload['x'] = x
+                    payload['y'] = y
+                    payload['z'] = z
+                    payload['pressure'] = pressure
 
-                p = json.dumps(payload, sort_keys=True);
-                print p
-                channel.basic_publish(exchange='touchvision', routing_key='glove', body=p)
+                    p = json.dumps(payload, sort_keys=True);
+                    print p
+                    channel.basic_publish(exchange='touchvision', routing_key='glove', body=p)
+            i += 1
     else:
         t = 0
         while True:
             try:
                 payload = {}
-                payload['timestamp'] = t
+                payload['timestamp'] = time.time()
                 payload['x'] = int(uniform(0,100))
                 payload['y'] = int(uniform(0,100))
                 payload['z'] = int(uniform(0,100))
