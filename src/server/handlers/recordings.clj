@@ -61,7 +61,7 @@
   (let [pressure (get-in req [:body :pressure])
         rmq-ch (get-in req [:resources :rabbit :rmq-ch])]
     (le/direct rmq-ch "touchvision")
-    (infof "[playback]: sending %d" pressure)
-    (lb/publish rmq-ch "touchvision" "playback"  (encode (:body req)) {:content-type "text/plain"})
+    (infof "[playback]: sending %f" pressure)
+    (lb/publish rmq-ch "touchvision" "playback"  (encode {:pressure (int pressure)}) {:content-type "text/plain"})
     (res {:msg "sent"
           :data (:body req)})))
