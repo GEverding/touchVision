@@ -29,9 +29,7 @@
                 (println out)
                 (log/fine l "got datoms")
                 (clear-screen owner)
-                (doseq [d datoms]
-                  (println d)
-                  (put! out {:type :post :data d})))
+                (put! out {:type :post :data datoms}))
               (js/alert "Not Valid Record"))))))))
 
 (defcomponent loader-view [app owner]

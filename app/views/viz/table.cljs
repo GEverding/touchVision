@@ -59,7 +59,10 @@
         [[m c] (alts! [ws-sub-chan s-chan e-chan])]
         (when m
           (condp = c
-            ws-sub-chan (om/update-state! owner :datoms #(conj % (:data m)))
+            ws-sub-chan (om/update-state! owner :datoms (fn [ds] (let [d (:data m)]
+                                                                  (if (vector? d)
+                                                                    (into [] (concat ds d))
+                                                                    (conj ds d)))))
             e-chan (if (= m :reset)
                      (om/set-state! owner :datoms []))
             s-chan (do

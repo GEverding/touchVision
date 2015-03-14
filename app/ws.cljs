@@ -25,10 +25,8 @@
               (when (-> res :body :data)
                 (let [ds (-> res :body :data)]
                   (do
-                    (doseq [d ds]
-                      (put! out {:type :post :data d}))
-                    (reset! start (-> ds last :timestamp)))
-                  )))))))))
+                    (put! out {:type :post :data ds})
+                    (reset! start (-> ds last :timestamp))))))))))))
 
 ;; stdout is a publisher channel
 (defn- listen [app-state event-bus]

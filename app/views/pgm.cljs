@@ -69,7 +69,7 @@
         [[m c] (async/alts! [ws-sub-chan e-chan])]
         (when m
           (condp = c
-            ws-sub-chan (om/update-state! owner :all-datoms #(conj % (:data m)))
+            ws-sub-chan (om/update-state! owner :all-datoms #(into [] (concat % (:data m))))
             e-chan (if (= m :reset)
                      (om/set-state! owner :all-datoms [])))
             (recur (async/alts! [ws-sub-chan e-chan]))))))

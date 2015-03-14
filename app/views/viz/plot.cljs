@@ -174,16 +174,22 @@
            ws-sub-chan (chan (sliding-buffer 25))]
        (async/tap (:bus event-bus) e-chan)
        (async/tap (:bus select-chan) s-chan)
+
        (sub (:pub ws-chan) :post ws-sub-chan)
        (go-loop
            [[m c] (alts! [ws-sub-chan s-chan e-chan])]
          (when m
            (condp = c
              ws-sub-chan (do
-                           (om/update-state! owner :datoms (fn [datoms]
-                                                             (if (< 2 (get-in m [:data :pressure]))
-                                                               (conj datoms (:data m))
-                                                               datoms)))
+                           (om/update-state! owner :datoms
+                                             (fn [datoms]
+                                               (let [d (:data m)]
+                                                 (if (vector? d)
+                                                   (let [ds (filter #(< 2 (:pressure %)) d)]
+                                                     (log/fine l (vec ds))
+                                                     (into [] (concat datoms (vec ds))))
+                                                   (conj datoms d))
+                                                 )))
                            (render owner (om/get-state owner :datoms)))
              s-chan (do
                            (om/set-state! owner :time-bound m)
