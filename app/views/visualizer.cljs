@@ -15,6 +15,13 @@
 
 (def ^:private l (log/get-logger "viz"))
 
+
+
+(defn hide? [bounds d]
+  (let [{:keys [low high]} bounds
+        t (get-in d [:timestamp])]
+    (and (>= t low) (< t high))))
+
 (defcomponent visualizer-view
   [app owner]
   (render

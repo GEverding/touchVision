@@ -9,14 +9,8 @@
             [om.dom :as dom :include-macros true]
             [om.core :as om :include-macros true]
             [sablono.core :as html :refer-macros [html]]
+            [client.colours :refer (pressure-colours)]
             [client.views.visualizer :refer (hide?)]))
-
-(def ^:private pressure-colours ["#A52A2A"
-                                 "#C25051"
-                                 "#E09432"
-                                 "#EFBD2E"
-                                 "#73B845"
-                                 "#009BDD"])
 
 (strokes/bootstrap)
 (defonce ^:private l (log/get-logger "pgm"))

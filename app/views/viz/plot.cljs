@@ -13,22 +13,13 @@
             [cljs-log.core :as log]
             [om.dom :as dom :include-macros true]
             [om.core :as om :include-macros true]
+            [client.colours :refer (pressure-colours)]
+            [client.views.visualizer :refer (hide?)]
             [sablono.core :as html :refer-macros [html]]))
 
 (def l (log/get-logger "3d"))
 (strokes/bootstrap)
 
-(def ^:private pressure-colours ["#A52A2A"
-                                 "#C25051"
-                                 "#E09432"
-                                 "#EFBD2E"
-                                 "#73B845"
-                                 "#009BDD"])
-
-(defn hide? [bounds d]
-  (let [{:keys [low high]} bounds
-        t (get-in d [:timestamp])]
-    (and (>= t low) (< t high))))
 
 (defn events->chan
   "Given a target DOM element and event type return a channel of
