@@ -38,13 +38,12 @@
    (html [:div {:class "loading-container col-md-12 col-sm-6"}
              [:h3 "Load Recording"]
              [:div.option-group
-              [:div.col-sm-6
+              [:div.col-sm-12
                [:input {:type "text"
-                        :ref "record-id"}]
-               ]
-              [:div.col-sm-6
+                        :ref "record-id"}]]
+              [:div.col-sm-12
                [:button {:type "button"
-                         :class "btn btn-success"
+                         :class "btn btn-success btn-block"
                          :on-click (fn [_] (load-recording app owner))
                          } "Load"]]
                ]])))
