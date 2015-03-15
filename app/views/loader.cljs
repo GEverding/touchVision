@@ -23,7 +23,7 @@
         (go
           (let [res (<! cb)]
             (if (= (:status res) 200)
-              (let [out (:chan ws-pub-chan)
+             (let [out (:chan ws-pub-chan)
                     datoms (get-in res [:body :data])]
                 (println datoms)
                 (println out)
