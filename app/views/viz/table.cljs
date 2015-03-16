@@ -39,7 +39,7 @@
        [:td (:y d)]
        [:td (:z d)]
        [:td (:pressure d)]
-       [:td (:timestamp d)]
+       [:td (.format (js/moment (:timestamp d)) "HH:mm:ss:SSS")]
        [:td (if (:is_new d)
               (/ (- (.getTime (js/Date.)) (:timestamp d)) 1000)
               "N/A")]]))))
