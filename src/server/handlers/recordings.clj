@@ -70,3 +70,9 @@
     (lb/publish rmq-ch "touchvision" "playback"  (encode {:pressure (int pressure)}) {:content-type "text/plain"})
     (res {:msg "sent"
           :data (:body req)})))
+
+(defn list-recordings [req]
+  (let [c (get-in req [:resources :db :conn])
+        rs (q/find-all-recordings c)]
+    (res {:msg "List Recordings"
+          :data (vec rs)})))
