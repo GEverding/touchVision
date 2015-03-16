@@ -42,15 +42,20 @@
 (defn get-recording-data [id req]
   (let [c (get-in req [:resources :db :conn])
         {:keys [start limit]} (:query-params req)
-        data (q/get-data-by-id c (read-string id)
+        data (q/get-data-by-id c
+                               (read-string id)
                                (read-string start)
-                               (read-string limit))]
+                               (read-string limit))
+        ids (vec (map #(:id %) data))]
+    (when-not (empty? ids)
+      (q/set-is-new-false! c ids))
     (res {:msg "New Data"
           :data (vec data)})))
 
 (defn get-recording-by-id [id req]
   (let [c (get-in req [:resources :db :conn])
-        data (q/get-recording-data c (read-string id))]
+        data (q/get-recording-data c (read-string id))
+        ids (vec (map #(:id %) data))]
     (if (< 0 (count data))
       (res {:msg id
             :data (vec data)})

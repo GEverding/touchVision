@@ -1,7 +1,7 @@
 -- ======================================================================
 -- ===   Sql Script for Database : touchVision
 -- ===
--- === Build : 14
+-- === Build : 15
 -- ======================================================================
 
 BEGIN WORK;
@@ -46,6 +46,7 @@ CREATE TABLE captured_data
     y             float8   not null,
     z             float8   not null,
     timestamp     float8   not null,
+    is_new        bool     not null default true,
 
     primary key(id),
 

@@ -31,7 +31,7 @@ def read_from_serial(s, connection, channel, kinematics, debug):
                     [t, x, y, z, pressure] = kinematics.get_latest_measurements()
 
                     payload = {}
-                    payload['timestamp'] =time.time()
+                    payload['timestamp'] = int(time.time()*1000)
                     payload['x'] = x
                     payload['y'] = y
                     payload['z'] = z
@@ -46,7 +46,7 @@ def read_from_serial(s, connection, channel, kinematics, debug):
         while True:
             try:
                 payload = {}
-                payload['timestamp'] = time.time()
+                payload['timestamp'] = int(time.time() * 1000)
                 payload['x'] = int(uniform(0,100))
                 payload['y'] = int(uniform(0,100))
                 payload['z'] = int(uniform(0,100))

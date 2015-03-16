@@ -39,7 +39,10 @@
        [:td (:y d)]
        [:td (:z d)]
        [:td (:pressure d)]
-       [:td (:timestamp d)]]))))
+       [:td (:timestamp d)]
+       [:td (if (:is_new d)
+              (/ (- (.getTime (js/Date.)) (:timestamp d)) 1000)
+              "N/A")]]))))
 
 (defcomponent table-view [app owner]
   (init-state
@@ -79,7 +82,8 @@
           [:th "Y"]
           [:th "Z"]
           [:th "Pressure"]
-          [:th "Timestamp"]]]
+          [:th "Timestamp"]
+          [:th "Response Time"]]]
         [:tbody
          (if-not (empty? ds)
            (om/build-all data-row-view ds {:key :id})

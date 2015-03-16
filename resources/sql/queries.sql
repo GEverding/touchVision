@@ -20,7 +20,7 @@ insert into captured_data (recording_id, pressure, x, y, z, timestamp) values(:r
 
 -- name: fetch-data-by-record-id
 -- Fetch All rows of a recording
-select id, pressure, x, y, z
+select id, pressure, x, y, z, is_new
 from captured_data
 where recording_id = :recording_id
 
@@ -34,14 +34,14 @@ where r.patient_id = p.id
 -- Find an active recording
 select r.id, p.name, r.created_on, r.start_time
 from recording as r, patient as p
-where r.patient_id = p.id and 
-      r.start_time is not null and 
+where r.patient_id = p.id and
+      r.start_time is not null and
       r.stop_time is null
 limit 1
 
 -- name: get-data-by-id
 -- Find all recording for a patient
-select id, pressure, x,y,z,timestamp
+select id, pressure, x, y, z, timestamp, is_new
 from captured_data
 where recording_id=:id and
       timestamp > :start
@@ -49,6 +49,11 @@ order by timestamp asc
 limit :limit
 
 -- name: get-recording-data
-select id,pressure,x,y,z,timestamp
+select id, pressure, x, y, z, timestamp, is_new
 from captured_data
 where recording_id=:id
+
+-- name: set-is-new-false!
+update captured_data
+set is_new=false
+where id in (:ids)
