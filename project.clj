@@ -40,7 +40,7 @@
                  [net.drib/strokes "0.5.1"]
                  [cljs-ajax "0.3.8"]
                  [prismatic/om-tools "0.3.10"]
-                 [com.andrewmcveigh/cljs-time "0.3.0"]
+                 [com.andrewmcveigh/cljs-time "0.3.2"]
                  [jarohen/chord "0.5.0" :exclusions [org.clojure/clojure]]
                  [org.om/om "0.8.0"]
                  [GEverding/cljs-log "0.1.0-SNAPSHOT"]
