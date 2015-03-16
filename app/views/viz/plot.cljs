@@ -177,7 +177,6 @@
                                                (let [d (:data m)]
                                                  (if (vector? d)
                                                    (let [ds (filter #(< 2 (:pressure %)) d)]
-                                                     (log/fine l (vec ds))
                                                      (into [] (concat datoms (vec ds))))
                                                    (conj datoms d))
                                                  )))
