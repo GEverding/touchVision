@@ -20,10 +20,12 @@ def read_from_serial(s, connection, channel, kinematics, debug):
             if "DMP ready! Waiting for first interrupt..." in incoming_data:
                 break
 
+        start = time.time()
+        data_points = 0
         while True:
             stdin = s.readline()
             packet = stdin.split(const.PACKET_DELIMINATOR)
-            if i % 10 == 0:
+            if i % 5 == 0:
                 for sub_packet in packet:
                     # print(sub_packet)
                     data = sub_packet.split(const.SUB_PACKET_DELIMINATOR)
@@ -36,13 +38,20 @@ def read_from_serial(s, connection, channel, kinematics, debug):
                     payload['y'] = y
                     payload['z'] = z
                     payload['pressure'] = pressure
-
                     p = json.dumps(payload, sort_keys=True);
                     print p
+
+                    data_points += 1
+                    throughput = (time.time() - start) / data_points
+                    print throughput
+
                     channel.basic_publish(exchange='touchvision', routing_key='glove', body=p)
             i += 1
     else:
         t = 0
+
+        start = time.time()
+        data_points = 0
         while True:
             try:
                 payload = {}
@@ -51,12 +60,16 @@ def read_from_serial(s, connection, channel, kinematics, debug):
                 payload['y'] = int(uniform(0,100))
                 payload['z'] = int(uniform(0,100))
                 payload['pressure'] = int(uniform(0,5))
-
                 p = json.dumps(payload, sort_keys=True);
                 print p
+
+                data_points += 1
+                throughput = (time.time() - start) / data_points
+                print throughput
+
                 channel.basic_publish(exchange='touchvision', routing_key='glove', body=p)
                 t += 1
-                time.sleep(1)
+                time.sleep(.1)
 
             except Exception as e:
                 print e
