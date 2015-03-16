@@ -26,9 +26,13 @@ where recording_id = :recording_id
 
 -- name: find-all-recordings
 -- Find all recording for a patient
-select r.id as recording_id, p.name, r.created_on, r.start_time, r.stop_time
-from recording as r, patient as p
-where r.patient_id = p.id
+select r.id as recording_id, r.created_on, r.start_time, r.stop_time, count(r.id) as captured_datoms
+from recording as r
+join patient as p on r.patient_id = p.id
+join captured_data as ds on ds.recording_id = r.id
+group by r.id
+order by r.id asc
+
 
 -- name: find-active-recording
 -- Find an active recording
