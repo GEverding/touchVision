@@ -1,5 +1,5 @@
 (ns client.views.options
-  (:require-macros [cljs.core.async.macros :refer [go-loop]] )
+  (:require-macros [cljs.core.async.macros :refer [go-loop go]] )
   (:require [cljs.core.async :as async :refer [put! <! >! chan merge]]
             [om-tools.core :refer-macros (defcomponent)]
             [om.dom :as dom :include-macros true]
@@ -24,17 +24,16 @@
       (put! event-bus :reset))))
 
 
-(defn clear-screen [app owner]
-  (let [event-bus (om/get-shared owner [:event-bus :chan])]
-        (log/warning l "clearing screen")
-        (put! event-bus :reset)))
+(defn zero-glove! [app owner]
+  (let [event-bus (om/get-shared owner [:event-bus :chan])
+        ch (r {:type :get :url "/clear"})]
+    (go (let [res (<! ch)]
+          (if (= (:status res) 200)
+            (do
+              (log/warning l "clearing screen")
+              (put! event-bus :reset))
+            (log/warning l "failed to zero glove"))))))
 
-(defn zero-position! [app owner]
-  (let [event-bus (om/get-shared owner [:event-bus :chan])]
-    (log/warning l "Preparing to zero position data and reset view")
-    (put! event-bus :reset)
-    ;; send request to zero
-    (put! event-bus :zeroed)))
 
 (defcomponent switch-view
   "Button Switch Component"
@@ -59,21 +58,15 @@
                        } "Fake"]]
             ))))
 
-(defcomponent clear-view [app owner]
-  (render
-    [_]
-    (html [:div {:class "col-sm-3 col-md-12 clear-container"}
-           [:button {:type "button"
-                     :class "btn btn-warning btn-block"
-                     :on-click (fn [_] (clear-screen app owner))
-                     } "Clear"]])))
-
 (defcomponent zero-view [app owner]
   (render
     [_]
     (html [:div {:class "col-sm-3 col-md-12 zero-container"}
            [:button {:type "button"
-                     :class (str "btn btn-danger btn-block ") :on-click (fn [_] (zero-position! app owner)) } "Zero" ]])))
+                     :class "btn btn-danger btn-block"
+                     :on-click (fn [_] (zero-glove! app owner))
+                     } "Zero"]])))
+
 
 (defcomponent options-view [app owner]
   (init-state [_])
@@ -85,6 +78,5 @@
              [:h3 "Capture Controls"]
              [:div.option-group
               (->switch-view app)
-              (->clear-view app)
               (->zero-view app) ]
              ]))))

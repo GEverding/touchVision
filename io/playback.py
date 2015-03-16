@@ -13,18 +13,17 @@ class Playback(object):
     self.debug = debug
     self.connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     self.channel = self.connection.channel()
-    # channel.queue_declare(queue='glove')
+
     self.channel.exchange_declare(exchange=exchange, type='direct')
     self.playback = self.channel.queue_declare(exclusive=True)
     self.playback_queue_name = self.playback.method.queue
-    self.glove = self.channel.queue_declare(exclusive=True)
-    self.glove_queue_name = self.glove.method.queue
     self.channel.queue_bind(exchange=exchange,
                             routing_key="playback",
                             queue=self.playback_queue_name)
     self.channel.queue_bind(exchange=exchange,
-                       routing_key="glove",
+                       routing_key="glove-in",
                        queue=self.glove_queue_name)
+    self.channel.basic_consume(self.glove_callback, queue=self.glove_queue_name, no_ack=True)
     self.channel.basic_consume(self.playback_callback, queue=self.playback_queue_name, no_ack=True)
 
 
@@ -33,6 +32,7 @@ class Playback(object):
 
   def stop(self):
     self.channel.stop_consuming()
+
 
   def playback_callback(self, ch, method, properties, body):
     decoded = json.loads(body)

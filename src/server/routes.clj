@@ -26,6 +26,7 @@
   (ANY "/recordings/:id/stop" [id :as r] (stop id r))
   (GET "/recordings/:id/data" [id :as r] (get-recording-data id r))
   (GET "/recording/:id" [id :as r] (get-recording-by-id id r))
+  (GET "/clear" [] glove-clear)
   (route/not-found "Go Away Troll"))
 
 (defn wrap-app [resources]

@@ -76,3 +76,10 @@
         rs (q/find-all-recordings c)]
     (res {:msg "List Recordings"
           :data (vec rs)})))
+
+(defn glove-clear [req]
+  (let [rmq-ch (get-in req [:resources :rabbit :rmq-ch])]
+    (le/direct rmq-ch "touchvision")
+    (info "Clearing Glove")
+    (lb/publish rmq-ch "touchvision" "glove-in" "" {:content-type "text/plain"})
+    (res {:msg "success!"})))

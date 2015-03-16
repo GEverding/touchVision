@@ -88,13 +88,14 @@ class Glove(object):
         self.channel = self.connection.channel()
         # channel.queue_declare(queue='glove')
         self.channel.exchange_declare(exchange=exchange, type='direct')
-        # self.glove = self.channel.queue_declare(exclusive=True)
-        # self.glove_queue_name = self.glove.method.queue
+        self.glove = self.channel.queue_declare(exclusive=True)
+        self.glove_queue_name = self.glove.method.queue
 
-        # self.channel.queue_bind(exchange=exchange,
-        #                         routing_key="glove",
-        #                         queue=self.glove_queue_name)
+        self.channel.queue_bind(exchange=exchange,
+                        routing_key="glove-in",
+                        queue=self.glove_queue_name)
 
+        self.channel.basic_consume(self.glove_callback, queue=self.glove_queue_name, no_ack=True)
         # self.channel.basic_consume(partial(self.glove_callback, kin=self.kinematics), queue=self.glove_queue_name, no_ack=True)
 
     def start(self):
@@ -107,5 +108,7 @@ class Glove(object):
         self.thread.join(0)
         self.connection.close()
 
-    def glove_callback(self, kin, ch, method, properties, body):
-        kin.reset();
+    def glove_callback(self, ch, method, properties, body):
+        print "glove in"
+        self.kinematics.reset()
+        print "reset"
