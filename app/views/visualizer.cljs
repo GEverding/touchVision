@@ -16,7 +16,6 @@
 (def ^:private l (log/get-logger "viz"))
 
 
-
 (defn hide? [bounds d]
   (let [{:keys [low high]} bounds
         t (get-in d [:timestamp])]

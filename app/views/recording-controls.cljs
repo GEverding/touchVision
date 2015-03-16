@@ -16,41 +16,38 @@
         (put! event-bus :reset)))
 
 (defn- new-recording [app owner]
-  (if (=  (om/get-state owner :state) :stopped)
-    (let [cb (r {:type :post
-                 :url "/recordings"
-                 :data {:patient-id (:patient-id @app)} })]
-      (go
-        (let [res (<! cb)]
-          (if (= (:status res) 200)
-            (let [id (get-in res [:body :data :id])]
-              (clear-screen owner)
-              (om/set-state! owner :recording-id id)
-              (om/update! app [:recording-id] id)
-              (om/set-state! owner :state :ready))))))))
+  (let [cb (r {:type :post
+               :url "/recordings"
+               :data {:patient-id (:patient-id @app)} })]
+    (go
+      (let [res (<! cb)]
+        (if (= (:status res) 200)
+          (let [id (get-in res [:body :data :id])]
+            (clear-screen owner)
+            (om/set-state! owner :recording-id id)
+            (om/update! app [:recording-id] id)
+            (om/set-state! owner :state :ready)))))))
 
 (defn- start-recording [app owner]
   (log/info (om/get-state owner))
-  (if (= (om/get-state owner :state) :ready)
-    (let [id (om/get-state owner :recording-id)
-          cb (r {:type :get
-                 :url (str "/recordings/" id "/start") })]
-      (go
-        (let [res (<! cb)]
-          (if (= (:status res) 200)
-            (om/set-state! owner :state :started))))
-      )))
+  (let [id (om/get-state owner :recording-id)
+        cb (r {:type :get
+               :url (str "/recordings/" id "/start") })]
+    (go
+      (let [res (<! cb)]
+        (if (= (:status res) 200)
+          (om/set-state! owner :state :started))))
+    ))
 
 (defn- stop-recording [app owner]
-  (if (= (om/get-state owner :state) :started)
-    (let [id (om/get-state owner :recording-id)
-          cb (r {:type :get
-                 :url (str "/recordings/" id "/stop") })]
-      (go
-        (let [res (<! cb)]
-          (if (= (:status res) 200)
-            (om/set-state! owner :state :stopped))))
-      )))
+  (let [id (om/get-state owner :recording-id)
+        cb (r {:type :get
+               :url (str "/recordings/" id "/stop") })]
+    (go
+      (let [res (<! cb)]
+        (if (= (:status res) 200)
+          (om/set-state! owner :state :stopped))))
+    ))
 
 (defcomponent recording-controls-view
   [app owner]
@@ -66,8 +63,6 @@
              [:h3 "Recording Controls"]
              [:div
               [:span (str "Current Recording: " recording-id)]]
-             [:div
-              [:span (str "Recording State: " s)]]
              [:div.option-group
               [:div.col-sm-4
                [:button {:type "button"
