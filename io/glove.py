@@ -37,7 +37,7 @@ def read_from_serial(s, connection, channel, kinematics, debug):
                     payload['x'] = x
                     payload['y'] = y
                     payload['z'] = z
-                    payload['pressure'] = pressure
+                    payload['pressure'] = min(5, pressure)
                     p = json.dumps(payload, sort_keys=True);
                     print p
 
