@@ -36,7 +36,7 @@ class Playback(object):
 
   def playback_callback(self, ch, method, properties, body):
     decoded = json.loads(body)
-    pressure = int(decoded['pressure'])
+    pressure = decoded['pressure']
     print " [x] %r:%r" % (method.routing_key, pressure)
     if not self.debug:
         self.serial.write(str(pressure));

@@ -176,7 +176,7 @@
                                              (fn [datoms]
                                                (let [d (:data m)]
                                                  (if (vector? d)
-                                                   (let [ds (filter #(< 2 (:pressure %)) d)]
+                                                   (let [ds (filter #(< 0.3 (:pressure %)) d)]
                                                      (into [] (concat datoms (vec ds))))
                                                    (conj datoms d))
                                                  )))
