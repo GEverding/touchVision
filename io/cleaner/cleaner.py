@@ -30,7 +30,7 @@ class KinematicsSolver:
 
 		# Velocity arrays
 		vel_x = [0.0, 0.0]
-		vel_y = [0.0, 0.0] 
+		vel_y = [0.0, 0.0]
 		vel_z = [0.0, 0.0]
 		self.vel = [vel_x, vel_y, vel_z]
 
@@ -159,8 +159,9 @@ class KinematicsSolver:
 			vx = 0
 			px = self.dt + 0.5 * ax * self.dt * self.dt
 		else:
+			# vx = self.vel[axis][1] + ax * self.dt
 			vx = 0
-			px = self.pos[axis][0] + 0.5 * ax * self.dt * self.dt * 1.0 # magic factor
+			px = self.pos[axis][1] + 0.5 * ax * self.dt * self.dt * 1.0 # magic factor
 		# self.add_new_value_to_FIFO(self.vel[axis], vx, vel_last_index)
 		# self.add_new_value_to_FIFO(self.pos[axis], px, pos_last_index)
 		if(self.sample_count == 1):
@@ -191,7 +192,7 @@ class KinematicsSolver:
 				# Kill ridiculous values
 				ax = 0.0
 				self.accel[axis][last_index] = 0
-			# Trigger on a string of constant 0 values, ignore sudden jumps after a long set of zeros and stop moving (velocity to zero) 
+			# Trigger on a string of constant 0 values, ignore sudden jumps after a long set of zeros and stop moving (velocity to zero)
 			# This is a form of smoothing to ignore noise spikes and to make sure we get realistic velocity even if we aren't sampling enough
 			trigger_sum = 0
 			for a_i in range(len(self.accel[axis]) - 1, len(self.accel[axis]) - 1 - trigger_length):
@@ -318,8 +319,3 @@ class KinematicsSolver:
 		for i in range(len(fifo) - 1):
 			fifo[i] = fifo[i + 1]
 		fifo[-1] = new_value
-	
-
-
-
-
