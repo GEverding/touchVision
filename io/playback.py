@@ -20,12 +20,7 @@ class Playback(object):
     self.channel.queue_bind(exchange=exchange,
                             routing_key="playback",
                             queue=self.playback_queue_name)
-    self.channel.queue_bind(exchange=exchange,
-                       routing_key="glove-in",
-                       queue=self.glove_queue_name)
-    self.channel.basic_consume(self.glove_callback, queue=self.glove_queue_name, no_ack=True)
     self.channel.basic_consume(self.playback_callback, queue=self.playback_queue_name, no_ack=True)
-
 
   def start(self):
     self.channel.start_consuming()

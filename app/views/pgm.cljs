@@ -97,9 +97,7 @@
         (html [:svg {:height (+ height 30) :width width :ref "svg"}
                (when (< 0 (count datoms))
                  (let [domain (->> datoms
-                                   ;(filter #(:visible %))
                                    (mapv (fn [{:keys [timestamp]}] timestamp)))]
-                   ;; (println (clj->js domain))
                    (-> x (.domain
                            (-> d3 (.extent (clj->js domain) ))))
                    (-> y (.domain [0 1]))
