@@ -16,7 +16,7 @@
     (when recording-id
       (let [cb (r {:type :get
                     :url (str "/recordings/" recording-id "/data")
-                   :data {:limit 100
+                   :data {:limit 1000
                           :start @start}})]
 
         (go
