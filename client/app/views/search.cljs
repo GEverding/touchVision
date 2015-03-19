@@ -1,4 +1,4 @@
-(ns client.views.search
+(ns app.views.search
   (:require [dommy.utils :as utils]
             [dommy.core :as dommy]
             [sablono.core :as html :refer-macros [html]]

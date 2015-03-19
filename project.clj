@@ -3,7 +3,7 @@
   :url "https://github.com/GEverding/touchVision"
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
-                 [org.clojure/clojurescript "0.0-2511"]
+                 [org.clojure/clojurescript "0.0-2843"]
                  [org.clojure/tools.cli "0.3.1"]
                  [org.clojure/clojure-contrib "1.2.0"]
                  [org.clojure/math.numeric-tower "0.0.4"]
@@ -32,17 +32,17 @@
                  [org.postgresql/postgresql "9.3-1102-jdbc41"]
                  [com.jolbox/bonecp "0.8.0.RELEASE"]
                  [org.clojure/java.jdbc "0.3.6"]
-                 [clojure.jdbc/clojure.jdbc-c3p0 "0.3.1"]
+                 [clojure.jdbc/clojure.jdbc-c3p0 "0.3.2"]
 
                  ; Client
                  [prismatic/dommy "1.0.0"]
                  [sablono "0.2.22"]
-                 [net.drib/strokes "0.5.1"]
-                 [cljs-ajax "0.3.8"]
-                 [prismatic/om-tools "0.3.10"]
+                 [net.drib/strokes "0.5.2-SNAPSHOT"]
+                 [cljs-ajax "0.3.10"]
+                 [prismatic/om-tools "0.3.11"]
                  [com.andrewmcveigh/cljs-time "0.3.2"]
-                 [jarohen/chord "0.5.0" :exclusions [org.clojure/clojure]]
-                 [org.om/om "0.8.0"]
+                 [jarohen/chord "0.6.0" :exclusions [org.clojure/clojure]]
+                 [org.omcljs/om "0.8.8"]
                  [GEverding/cljs-log "0.1.0-SNAPSHOT"]
                  ]
   :plugins [[lein-cljsbuild "1.0.4"]
@@ -52,7 +52,17 @@
   :repositories {"sonatype-oss-public" "https://oss.sonatype.org/content/groups/public/"}
   :profiles {:dev {:source-paths ["dev" "src"]
                    :dependencies [[cider/cider-nrepl "0.9.0-SNAPSHOT"]
-                                  [org.clojure/tools.nrepl "0.2.7"]]
+                                  [alembic "0.3.2"]
+                                  [org.clojure/tools.nrepl "0.2.8"]
+                                  [figwheel "0.2.5"]
+                                  [figwheel-sidecar "0.2.5"]
+                                  [com.cemerick/piggieback "0.1.5"]
+                                  [weasel "0.6.0"]]
+
+                   :plugins [[lein-figwheel "0.2.5"]]
+                   :figwheel {:http-server-root "public"
+                              :server-port 3449
+                              :css-dirs ["resources/public/css"]}
                    :repl-options {:init-ns user
                                   :nrepl-middleware
                                   [cider.nrepl.middleware.apropos/wrap-apropos
@@ -70,19 +80,19 @@
                                    cider.nrepl.middleware.trace/wrap-trace
                                    cider.nrepl.middleware.undef/wrap-undef]}}
              :prod {:aot :all
-                    :hooks [leiningen.cljsbuild]
                     :main server.system}}
   :cljsbuild {
     :builds [{:id "dev"
-              :source-paths ["app"]
+              :source-paths ["client"]
               :compiler {
                          :output-to "resources/public/js/touchVision.js"
                          :output-dir "resources/public/js/out"
                          :source-map "resources/public/js/touchVision.js.map"
+                         :asset-path "js/out"
                          :pretty-print true
                          :optimizations :none } }
               {:id "prod"
-               :source-paths ["app"]
+               :source-paths ["client"]
                :compiler {:output-to "resources/cljs/touchVision.min.js"
                           :output-dir "resources/cljs"
                           ;; TODO: Testing Purposes - Remove for Prod

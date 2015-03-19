@@ -1,4 +1,4 @@
-(ns client.request
+(ns app.request
   ;; (:use plumbing.core)
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [ajax.core :refer [GET POST PUT DELETE]]
@@ -56,4 +56,3 @@
    (DELETE (:url opts)
            (build-request ch (:data opts)))
    ch))
-

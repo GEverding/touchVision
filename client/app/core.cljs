@@ -1,4 +1,4 @@
-(ns client.core
+(ns ^:figwheel-always app.core
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [dommy.utils :as utils]
             [cljs.core.async :as async :refer [<! >! chan sub sliding-buffer]]
@@ -8,22 +8,23 @@
             [sablono.core :as html :refer-macros [html]]
             [plumbing.core :as plumbing :include-macros true]
             [cljs-log.core :as log]
-            [client.views.pgm :refer (->pgm-view)]
-            [client.views.visualizer :refer (->visualizer-view)]
-            [client.views.navbar :refer [navbar-controls]]
-            [client.views.options :refer (->options-view)]
-            [client.views.loader :refer (->loader-view)]
-            [client.views.recording-controls :refer (->recording-controls-view)]
-            [client.views.downloader :refer (->downloader-view)]
-            [client.ws :as ws]
-            [client.request :refer (r)]))
+            [figwheel.client :as fw]
+            [app.views.pgm :refer (->pgm-view)]
+            [app.views.visualizer :refer (->visualizer-view)]
+            [app.views.navbar :refer [navbar-controls]]
+            [app.views.options :refer (->options-view)]
+            [app.views.loader :refer (->loader-view)]
+            [app.views.recording-controls :refer (->recording-controls-view)]
+            [app.views.downloader :refer (->downloader-view)]
+            [app.ws :as ws]
+            [app.request :refer (r)]))
 
 (enable-console-print!)
 (log/start-display (log/console-output))
 
 (def l (log/get-logger "core"))
 
-(def app-state (atom nil))
+(defonce app-state (atom nil))
 
 (defn index [ws-chan download-chan select-chan event-bus]
   (om/root
@@ -88,6 +89,28 @@
     ;;         (log/finest l (:data m))
     ;;         (recur (<! ch))
     ;;         ))))
+
+    (fw/start {
+               ;; configure a websocket url if you are using your own server
+               :websocket-url "ws://localhost:3449/figwheel-ws"
+
+               ;; optional callback
+               :on-jsload (fn [] (print "reloaded"))
+
+               ;; The heads up display is enabled by default
+               ;; to disable it:
+               ;; :heads-up-display false
+
+               ;; when the compiler emits warnings figwheel
+               ;; blocks the loading of files.
+               ;; To disable this behavior:
+               ;; :load-warninged-code true
+
+               ;; if figwheel is watching more than one build
+               ;; it can be helpful to specify a build id for
+               ;; the client to focus on
+               ;; :build-id "example"
+               })
     ))
 
 (main)

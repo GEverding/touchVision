@@ -1,4 +1,4 @@
-(ns client.colours)
+(ns app.colours)
 
 (def pressure-colours ["#0074D9"
                        "#39CCCC"

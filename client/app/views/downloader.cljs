@@ -1,4 +1,4 @@
-(ns client.views.downloader
+(ns app.views.downloader
   (:require-macros [cljs.core.async.macros :refer [go-loop go]] )
   (:require [strokes :refer [d3]]
             [dommy.utils :as utils]
@@ -10,7 +10,7 @@
             [cljs-log.core :as log]
             [om.dom :as dom :include-macros true]
             [om.core :as om :include-macros true]
-            [client.request :refer (r)]
+            [app.request :refer (r)]
             [sablono.core :as html :refer-macros [html]]
             ))
 

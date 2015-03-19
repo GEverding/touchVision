@@ -1,20 +1,19 @@
-(ns client.views.viz.plot
+(ns app.views.viz.plot
   (:require-macros [cljs.core.async.macros :refer [go go-loop]]
-                   [cljs.core.match.macros :refer [match]])
+                   )
   (:import [goog.events EventType])
   (:require [strokes :refer (d3)]
             [dommy.utils :as utils]
             [dommy.core :as dommy]
             [goog.events :as events]
             [om-tools.core :refer-macros [defcomponent]]
-            [cljs.core.match :as m]
-            [client.request :refer (r)]
+            [app.request :refer (r)]
             [cljs.core.async :as async :refer [<! put! chan sub sliding-buffer alts!]]
             [cljs-log.core :as log]
             [om.dom :as dom :include-macros true]
             [om.core :as om :include-macros true]
-            [client.colours :refer (pressure-colours)]
-            [client.views.visualizer :refer (hide?)]
+            [app.colours :refer (pressure-colours)]
+            [app.views.helper :refer (hide?)]
             [sablono.core :as html :refer-macros [html]]))
 
 (def l (log/get-logger "3d"))
@@ -203,15 +202,15 @@
            down (do
                   (log/fine l "DOWN")
                   (om/set-state! owner :down true)
-                  (om/set-state! owner :sx (.-clientX event))
-                  (om/set-state! owner :sy (.-clientY event)))
+                  (om/set-state! owner :sx (.-appX event))
+                  (om/set-state! owner :sy (.-appY event)))
            up (do
                 (log/fine l "UP")
                 (om/set-state! owner :down false))
            move (when (om/get-state owner :down)
                   (let [{:keys [sx sy]} (om/get-state owner)
-                        dx (- (.-clientX event) sx)
-                        dy (- (.-clientY event) sy)]
+                        dx (- (.-appX event) sx)
+                        dy (- (.-appY event) sy)]
                     (aset scatter-plot "rotation" "y" (+ (aget scatter-plot "rotation" "y") (* dx 0.01)))
                     (aset camera "position" "y" (+ (aget camera "position" "y") dy))
                     (om/set-state! owner :sx (+ sx dx))

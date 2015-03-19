@@ -1,4 +1,4 @@
-(ns client.history
+(ns app.history
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require
     [cljs.core.async :as async :refer [<! >! chan put! timeout]]
@@ -109,4 +109,3 @@
                 )
            (check-url frag)
            frag))))
-

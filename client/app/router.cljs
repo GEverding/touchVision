@@ -1,9 +1,9 @@
-(ns client.router
+(ns app.router
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require
     [cljs.core.async :as async :refer [<! >! chan put! timeout]]
     [clojure.string :as s]
-    [client.history :as H]))
+    [app.history :as H]))
 
 (def ^:private routes (atom {}))
 
@@ -67,4 +67,3 @@
           (let [p (<! history-chan)]
             (.log js/console (str "go to " p))
             (handle-change p)))) ))
-
