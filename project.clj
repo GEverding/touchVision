@@ -52,7 +52,7 @@
   :repositories {"sonatype-oss-public" "https://oss.sonatype.org/content/groups/public/"}
   :profiles {:dev {:source-paths ["dev" "src"]
                    :dependencies [[cider/cider-nrepl "0.9.0-SNAPSHOT"]
-                                  [org.clojure/tools.nrepl "0.2.7"]]
+                                  [org.clojure/tools.nrepl "0.2.8"]]
                    :repl-options {:init-ns user
                                   :nrepl-middleware
                                   [cider.nrepl.middleware.apropos/wrap-apropos

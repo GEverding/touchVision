@@ -49,10 +49,9 @@
 (defcomponent select-row [data owner]
   (render
    [_]
-   (let [formatter (tf/formatters :basic-date-time)]
-     (html [:option
-            {:value (:recording_id data)}
-            (str (:recording_id data) "-" (.format (js/moment (:created_on data)) "l LTS"))]))))
+   (html [:option
+          {:value (:recording_id data)}
+          (str (:recording_id data) "-" (.format (js/moment (:created_on data)) "l LTS"))])))
 
 (defcomponent loader-view [app owner]
   (init-state
