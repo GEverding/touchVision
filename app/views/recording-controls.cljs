@@ -1,4 +1,4 @@
-(ns app.views.recording-controls
+(ns client.views.recording-controls
   (:require-macros [cljs.core.async.macros :refer [go-loop go]] )
   (:require [cljs.core.async :as async :refer [put! <! >! chan merge]]
             [om-tools.core :refer-macros (defcomponent)]
@@ -6,7 +6,7 @@
             [om.core :as om :include-macros true]
             [cljs-log.core :as log]
             [sablono.core :as html :refer-macros [html]]
-            [app.request :refer (r)]))
+            [client.request :refer (r)]))
 
 (defonce ^:private l (log/get-logger "rec"))
 

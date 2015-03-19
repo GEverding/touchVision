@@ -1,14 +1,16 @@
-(ns app.views.loader
-  (:require-macros [cljs.core.async.macros :refer [go]])
+(ns client.views.loader
+  (:require-macros [cljs.core.async.macros :refer [go]]
+                   [cljs.core.match.macros :refer [match]])
   (:require [dommy.utils :as utils]
             [dommy.core :as dommy]
             [om-tools.core :refer-macros [defcomponent]]
+            [cljs.core.match :as m]
             [cljs.core.async :as async :refer [<! pub put! chan sub sliding-buffer]]
             [cljs-log.core :as log]
             [om.dom :as dom :include-macros true]
             [om.core :as om :include-macros true]
-            [app.views.helper :refer (clear-screen)]
-            [app.request :refer (r)]
+            [client.views.helper :refer (clear-screen)]
+            [client.request :refer (r)]
             [sablono.core :as html :refer-macros [html]]))
 
 (def ^:private l (log/get-logger "loader"))
@@ -26,7 +28,9 @@
             (if (= (:status res) 200)
              (let [out (:chan ws-pub-chan)
                     datoms (get-in res [:body :data])]
-                (log/fine l "loaded datoms")
+                (println datoms)
+                (println out)
+                (log/fine l "got datoms")
                 (clear-screen owner)
                 (put! out {:type :post :data datoms}))
               (js/alert "Not Valid Record"))))))))
@@ -35,6 +39,7 @@
 
   (let [ch (r {:type :get
                :url "/recordings"})]
+    (log/fine l "Fetcing new Recordings")
     (go (let [res (<! ch)]
           (if (= (:status res) 200)
             (do
@@ -44,9 +49,10 @@
 (defcomponent select-row [data owner]
   (render
    [_]
-   (html [:option
-          {:value (:recording_id data)}
-          (str (:recording_id data) "-" (.format (js/moment (:created_on data)) "l LTS"))])))
+   (let [formatter (tf/formatters :basic-date-time)]
+     (html [:option
+            {:value (:recording_id data)}
+            (str (:recording_id data) "-" (.format (js/moment (:created_on data)) "l LTS"))]))))
 
 (defcomponent loader-view [app owner]
   (init-state

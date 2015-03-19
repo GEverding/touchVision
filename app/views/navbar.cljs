@@ -1,4 +1,4 @@
-(ns app.views.navbar
+(ns client.views.navbar
   (:require [dommy.utils :as utils]
             [dommy.core :as dommy :refer-macros [sel sel1]]
             [om.core :as om :include-macros true]
@@ -29,3 +29,4 @@
   (reify
     om/IRender
     (render [_] (navbar-html))))
+

@@ -1,4 +1,4 @@
-(ns app.views.pgm
+(ns client.views.pgm
   (:require-macros [cljs.core.async.macros :refer [go-loop]] )
   (:require [strokes :refer [d3]]
             [dommy.utils :as utils]
@@ -9,8 +9,8 @@
             [om.dom :as dom :include-macros true]
             [om.core :as om :include-macros true]
             [sablono.core :as html :refer-macros [html]]
-            [app.colours :refer (pressure-colours)]
-            [app.views.helper :refer (hide?)]))
+            [client.colours :refer (pressure-colours)]
+            [client.views.visualizer :refer (hide?)]))
 
 (strokes/bootstrap)
 (defonce ^:private l (log/get-logger "pgm"))

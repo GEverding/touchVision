@@ -1,9 +1,9 @@
-(ns app.ws
+(ns client.ws
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [chord.client :refer [ws-ch]]
             [cljs-log.core :as log]
             [cljs.core.async :as async :refer [<! >! chan pub close! put! pub sliding-buffer]]
-            [app.request :refer (r)]
+            [client.request :refer (r)]
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]))
 

@@ -3,7 +3,7 @@
 # Set this to the root of your project when deployed:
 http_path = "resources/public"
 css_dir = "resources/public/css"
-sass_dir = "client/scss"
+sass_dir = "app/scss"
 images_dir = "images"
 javascripts_dir = "javascripts"
 
