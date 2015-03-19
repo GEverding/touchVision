@@ -4,28 +4,42 @@ import json
 import threading
 import thread
 import time
-import signal
+import logging
 from cleaner.cleaner import KinematicsSolver
 from functools import partial
 import cleaner.constants as const
 from random import uniform, randint, randrange
 
+log = logging.getLogger("glove")
+log.setLevel(logging.DEBUG)
+fh = logging.FileHandler("log/glove.log")
+fh.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+formatter = logging.Formatter('%(name)-10s: %(levelname)-8s %(message)s')
+ch.setFormatter(formatter)
+
+log.addHandler(fh)
+log.addHandler(ch)
+
 def read_from_serial(s, connection, channel, kinematics, debug):
 
     if not debug:
         i = 1
+        log.info("Waiting for Serial Port to Clear Out")
         while True:
             incoming_data = s.readline()
-            print(incoming_data)
+            # print(incoming_data)
             if "DMP ready! Waiting for first interrupt..." in incoming_data:
                 break
 
+        log.info("Serial Port Cleared out")
         start = time.time()
         data_points = 0
         while True:
             stdin = s.readline()
             packet = stdin.split(const.PACKET_DELIMINATOR)
-            if i % 5 == 0:
+            if i % 10 == 0:
                 for sub_packet in packet:
                     # print(sub_packet)
                     data = sub_packet.split(const.SUB_PACKET_DELIMINATOR)
@@ -39,11 +53,11 @@ def read_from_serial(s, connection, channel, kinematics, debug):
                     payload['z'] = z
                     payload['pressure'] = min(5, pressure)
                     p = json.dumps(payload, sort_keys=True);
-                    print p
+                    log.debug("\n%s",p)
 
                     data_points += 1
                     throughput = (time.time() - start) / data_points
-                    print throughput
+                    log.debug("Throughput: %d",throughput)
 
                     channel.basic_publish(exchange='touchvision', routing_key='glove', body=p)
             i += 1
@@ -61,11 +75,11 @@ def read_from_serial(s, connection, channel, kinematics, debug):
                 payload['z'] = int(uniform(0,100))
                 payload['pressure'] = int(uniform(0,5))
                 p = json.dumps(payload, sort_keys=True);
-                print p
+                log.debug(p)
 
                 data_points += 1
                 throughput = (time.time() - start) / data_points
-                print throughput
+                log.debug("Throughput: %d", throughput)
 
                 channel.basic_publish(exchange='touchvision', routing_key='glove', body=p)
                 t += 1
@@ -78,8 +92,11 @@ def read_from_serial(s, connection, channel, kinematics, debug):
 class Glove(object):
     def __init__(self, exchange, tty, debug):
         if not debug:
+            log.info("Glove in Live Mode")
             self.serial = serial.Serial(tty, 115200)
         else:
+
+            log.info("Glove in Debug Mode")
             self.serial = None
 
         self.debug = debug
@@ -99,16 +116,17 @@ class Glove(object):
         # self.channel.basic_consume(partial(self.glove_callback, kin=self.kinematics), queue=self.glove_queue_name, no_ack=True)
 
     def start(self):
-        print "starting thread"
+        log.info("Starting Glove Thread")
         self.thread = threading.Thread(target=read_from_serial, args=(self.serial, self.connection, self.channel, self.kinematics, self.debug))
         self.thread.daemon = True
         self.thread.start()
+        log.info("Glove Up and Running")
 
     def stop(self):
         self.thread.join(0)
         self.connection.close()
 
     def glove_callback(self, ch, method, properties, body):
-        print "glove in"
+        log.warn("Resetting Kinematics...")
         self.kinematics.reset()
-        print "reset"
+        log.info("Kinematics Reset Complete")
