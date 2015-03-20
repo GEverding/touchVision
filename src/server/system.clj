@@ -19,12 +19,14 @@
     :writer (component/using
               (writer/start-writer)
               [:capture :db :rabbit])
+    :reader (component/using
+             (reader/start-reader)
+             [:writer :rabbit])
     :app (component/using
            (app/start-app port threads)
-           [:capture :writer :db :rabbit])))
+           [:capture :writer :reader :db :rabbit])))
 
 (defn -main [& args]
   (let [[port threads mode] args]
     (component/start
       (system))))
-

@@ -28,8 +28,8 @@
             (when @current_recording
               (let [row (q/append<! conn @current_recording pressure x y z timestamp)]
                 ;(debug "saved: " row)
-                ;; (when row
-                ;;   (put! stdout {:type :post :data row}))
+                (when row
+                  (put! stdout (:pressure row)))
                 ))
             (recur (<! stdin)))))
       (-> this
