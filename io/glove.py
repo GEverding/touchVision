@@ -23,13 +23,12 @@ log.addHandler(fh)
 log.addHandler(ch)
 
 def read_from_serial(s, connection, channel, kinematics, debug):
-
     if not debug:
         i = 1
         log.info("Waiting for Serial Port to Clear Out")
         while True:
             incoming_data = s.readline()
-            # print(incoming_data)
+            log.debug(incoming_data)
             if "DMP ready! Waiting for first interrupt..." in incoming_data:
                 break
 
@@ -53,11 +52,11 @@ def read_from_serial(s, connection, channel, kinematics, debug):
                     payload['z'] = z
                     payload['pressure'] = min(5, pressure)
                     p = json.dumps(payload, sort_keys=True);
-                    log.debug("\n%s",p)
+                    log.debug(p)
 
                     data_points += 1
                     throughput = (time.time() - start) / data_points
-                    log.debug("Throughput: %d",throughput)
+                    log.debug("Throughput: %f",throughput)
 
                     channel.basic_publish(exchange='touchvision', routing_key='glove', body=p)
             i += 1
