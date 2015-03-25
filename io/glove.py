@@ -15,7 +15,7 @@ log.setLevel(logging.DEBUG)
 fh = logging.FileHandler("log/glove.log")
 fh.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
+ch.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(name)-10s: %(levelname)-8s %(message)s')
 ch.setFormatter(formatter)
 

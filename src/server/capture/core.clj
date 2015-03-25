@@ -36,7 +36,8 @@
           out (chan (sliding-buffer 10))
           stdout (pub out :type)]
       (sub (:stdout rabbit) :glove stdin)
-      (swap! state assoc :mode mode )
+      (swap! state assoc :mode mode)
+      (swap! state assoc :demo true)
       (go-loop
         [i 0]
         (if (= (:mode @state) :live)

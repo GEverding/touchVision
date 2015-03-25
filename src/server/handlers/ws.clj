@@ -34,5 +34,6 @@
        current-recording (q/find-active-recording conn) ]
     (res {:msg "init"
           :data {:mode (:mode @capture-state)
+                 :demo (:demo @capture-state)
                  :patient-id 1
                  :recording-id (-> current-recording first :id)}})))

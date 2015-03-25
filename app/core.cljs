@@ -1,7 +1,7 @@
 (ns client.core
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [dommy.utils :as utils]
-            [cljs.core.async :as async :refer [<! >! chan sub sliding-buffer]]
+            [cljs.core.async :as async :refer [<! >! chan sub sliding-buffer put!]]
             [dommy.core :refer-macros [sel sel1]]
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
@@ -54,6 +54,49 @@
               :select-chan select-chan
               :event-bus event-bus}}))
 
+(defn clear-screen [event-bus]
+  (let [event-chan (get-in event-bus [:chan])]
+        (log/warning l "clearing screen")
+        (put! event-chan :reset)))
+
+(defn- start-recording [app-state event-bus]
+  (let [id (:recording-id @app-state)
+        cb (r {:type :get
+               :url (str "/recordings/" id "/start") })]
+    (go
+      (let [res (<! cb)]
+        (if (= (:status res) 200)
+          (log/fine l "new recording"))))))
+
+(defn- new-recording [app-state event-bus]
+  (let [cb (r {:type :post
+               :url "/recordings"
+               :data {:patient-id (:patient-id @app-state)} })]
+    (go
+      (let [res (<! cb)]
+        (if (= (:status res) 200)
+          (let [id (get-in res [:body :data :id])]
+            (clear-screen event-bus)
+            (swap! app-state assoc :recording-id id)
+            (start-recording app-state event-bus)))))))
+
+(defn- stop-recording [app-state event-bus]
+  (let [id (:recording-id @app-state)]
+    (if id
+      (let [cb (r {:type :get
+                   :url (str "/recordings/" id "/stop") })]
+
+        (go
+          (let [res (<! cb)]
+            (if (= (:status res) 200)
+              (do
+                (log/fine l "stop recording")
+                (new-recording app-state event-bus))))))
+      (new-recording app-state event-bus))))
+
+(defn demo-mode [app-state event-bus]
+  (stop-recording app-state event-bus))
+
 (defn main []
   (let [
         select-chan (chan)
@@ -80,6 +123,11 @@
                                  v))]
             (log/fine l new-app-state)
             (reset! app-state new-app-state)
+
+            (when (:demo @app-state)
+              (do
+                (demo-mode app-state bus)
+                (js/setInterval demo-mode 60000 app-state bus)))
             (index stream download-chan select-bus bus)))))
     ;; (go
     ;;   (loop [m (<! ch)]

@@ -6,6 +6,8 @@
         reader (get-in req [:resources :reader :realtime?])
         query-params (get-in req [:query-params])]
     (println query-params)
+    (when (contains? query-params :demo)
+      (swap! capture assoc :demo (:demo query-params)))
     (when (contains? query-params :mode)
       (swap! capture assoc :mode (keyword (:mode query-params))))
     (when (contains? query-params :realtime)

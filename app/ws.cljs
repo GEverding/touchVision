@@ -42,7 +42,7 @@
             (log/info l "resetting start timestamp")
             (reset! start 0)))
         (recur (<! e-chan))))
-    (js/setInterval fetch 2500 app-state out)
+    (js/setInterval fetch 1000 app-state out)
 
     {:pub stdout
      :chan out}))

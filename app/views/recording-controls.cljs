@@ -30,7 +30,7 @@
 
 (defn- start-recording [app owner]
   (log/info (om/get-state owner))
-  (let [id (om/get-state owner :recording-id)
+  (let [id (:recording-id @app)
         cb (r {:type :get
                :url (str "/recordings/" id "/start") })]
     (go
@@ -40,7 +40,7 @@
     ))
 
 (defn- stop-recording [app owner]
-  (let [id (om/get-state owner :recording-id)
+  (let [id (:recording-id @app)
         cb (r {:type :get
                :url (str "/recordings/" id "/stop") })]
     (go
